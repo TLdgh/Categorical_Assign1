@@ -1,0 +1,27 @@
+---
+title: "MAT5317 Categorical Assignment 1"
+author: 
+  - Teng Li(7373086)
+  - Lucas() 
+  - Chutong Zhang()
+output: pdf_document
+header-includes: 
+  - \renewcommand{\and}{\\}
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Introduction
+
+# Method
+
+# Result
+
+# Discussion
+
+# Conclusion
+
+# References
