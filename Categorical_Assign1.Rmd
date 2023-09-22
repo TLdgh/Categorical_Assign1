@@ -3,7 +3,7 @@ title: "MAT5317 Categorical Assignment 1"
 author: 
   - Teng Li(7373086)
   - Zhize Lu(300075114) 
-  - Chutong Zhang()
+  - Chutong Zhang(300311325)
 output: pdf_document
 header-includes: 
   - \renewcommand{\and}{\\}
