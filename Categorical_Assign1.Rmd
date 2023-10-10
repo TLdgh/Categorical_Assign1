@@ -18,16 +18,16 @@ bibliography: References.bib
 link-citations: yes
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
 # Introduction
 
-We aim to study the relationship between the weight variable and the other health related variables of the data. 
+We aim to study the relationship between the weight variable and the other health related variables of the data.
 
 # Method
+
 We began our study by doing an exploratory analysis among the variables through various tables and charts. We then performed several hypothesis tests on some of the variables. Lastly we did a linear regression model fit to the response variable "weight" with other variables and confounders.
 
 ```{r, include=FALSE}
@@ -75,6 +75,18 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
   row_spec(0,bold=TRUE)
 ```
 
+To ensure the accuracy and reliability of our analysis, we first examine the dataset for any missing values. The table below lists variables with missing values and the respective count of missing entries:
+
+```{r}
+#calculate missing data
+missing_data <- sapply(nhanes, function(x) sum(is.na(x)))
+missing_data <- missing_data[missing_data > 0]
+missing_data_df <- as.data.frame(missing_data)
+colnames(missing_data_df) <- c("Number of Missing Values")
+
+knitr::kable(missing_data_df, caption = "Variables with Missing Values") %>%
+  kable_styling(font_size=10,full_width = FALSE, latex_options=c("striped","scale_down","hold_position"))
+```
 
 # Result
 
