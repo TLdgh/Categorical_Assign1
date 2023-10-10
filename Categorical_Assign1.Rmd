@@ -24,6 +24,9 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 # Introduction
+We were given the data set of The National Health and Nutrition Examination Survey (NHANES). The survey program has been conducted as a series of surveys designed to assess the health and nutritional status of adults and children in the United States since the 1960s, according to CDC [@CDC]. It combines in-person face-to-face interviews and physical examinations of participants for data collection. 
+
+The survey data wasn't a simple random sample, however. According to CDC's National Health and Nutrition Examination Survey: Plan and Operations, 1999–2010 [@SurveyDesign], the sampling strategy consists of several stages: 1. Selection of counties as primary sampling units (PSU). 2. selection of segments within PSUs that constitute blocks of households. 3. Selection of specific households within segments. 4. Selection of individuals within a household. 
 
 We aim to study the relationship between the weight variable and the other health related variables of the data. 
 
@@ -44,7 +47,7 @@ DataDict<-data.frame(
   Variables=colnames(nhanes), Size=nrow(nhanes), 
   Type=sapply(nhanes, function(x) class(x)),
   Example=sapply(nhanes, function(x) paste(as.character(head(unique(x),3)), collapse = ", ")),
-  Number.Unique=sapply(nhanes, function(x) length(unique(x))),
+  Number.Unique=sapply(nhanes, function(x) length(unique(na.omit(x)))),
   Number.Missing=sapply(nhanes, function(x) sum(is.na(x))),
   Comment=c("Identification Code (1 - 6482)",
             "Gender (1: Male, 2: Female)",
@@ -75,10 +78,46 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
   row_spec(0,bold=TRUE)
 ```
 
+Based on thresholds established by clinicians, we categorizing four variables related to the cholesterol and blood pressure level.
 
-# Result
+```{r}
 
-# Discussion
+nhanes_data <- nhanes
+
+#discretize columns related to Cholesterol and blood pressure
+nhanes_data$tchol_cat <- cut(nhanes_data$tchol, 
+                             breaks = c(0, 199, 239, Inf), 
+                             labels = c("HEALTHY", "AT-RISK", "DANGEROUS"))
+
+nhanes_data$hdl_cat <- cut(nhanes_data$hdl, 
+                           breaks = c(0, 39, 59, Inf), 
+                           labels = c("DANGEROUS", "AT-RISK", "HEALTHY"))
+
+nhanes_data$sysbp_cat <- cut(nhanes_data$sysbp, 
+                             breaks = c(-Inf, 119.9, 129.9, 139.9, 179.9, Inf),
+                             labels = c("NORMAL", "ELEVATED", "HYPERTENSION STAGE 1", 
+                                        "HYPERTENSION STAGE 2", "HYPERTENSIVE CRISIS"))
+
+nhanes_data$dbp_cat <- cut(nhanes_data$dbp, 
+                           breaks = c(-Inf, 79.9, 89.9, 119.9, Inf),
+                           labels = c("NORMAL", "HYPERTENSION STAGE 1", 
+                                      "HYPERTENSION STAGE 2", "HYPERTENSIVE CRISIS"))
+
+#show example of modified data'
+set.seed(123)
+examples_data <- nhanes_data[sample(nrow(nhanes_data), 5), c("tchol", "tchol_cat", "hdl", "hdl_cat", "sysbp", "sysbp_cat", "dbp", "dbp_cat")]
+knitr::kable(examples_data, 
+             caption = "Examples of Original and Discretized Health Metrics",
+             align = "c")
+```
+
+
+
+
+
+
+
+
 
 # Conclusion
 
