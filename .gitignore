@@ -11,9 +11,7 @@
 Categorical_Assign1.Rproj
 
 # produced vignettes
-*.html
 *.log
-*.pdf
 *.tex
 Figures/*_files/
 
