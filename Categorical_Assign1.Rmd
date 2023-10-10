@@ -65,7 +65,7 @@ DataDict<-data.frame(
             "Walk or Bicycle (1: Yes, 2: No)",
             "Vigorous Recreational Activities (1: Yes, 2: No)",
             "Moderate Recreational Activities (1: Yes, 2: No)",
-            "Minutes of Sedentary Activity per Week (1: Yes, 2: No)",
+            "Minutes of Sedentary Activity per Week (0 - 840)",
             "BMI>35 (1: No, 2: Yes)")
 )
 
