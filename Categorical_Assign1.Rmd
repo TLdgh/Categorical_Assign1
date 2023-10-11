@@ -92,7 +92,7 @@ gender<-nhanes%>%
       scale_y_continuous( labels = scales::comma  ) +
     theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45))+
    
-   labs(title="Average weight in Different Age",x="Age", y="Average weight (Kg)")+
+   labs(title="Average Weight in Different Age",x="Age", y="Average weight (Kg)")+
    theme(plot.title = element_text(hjust = 0.5))
 ```
 
