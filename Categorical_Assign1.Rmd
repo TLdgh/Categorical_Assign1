@@ -80,6 +80,8 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
 
 Based on thresholds established by clinicians, we categorizing four variables related to the cholesterol and blood pressure level.
 
+(add two tables showing the thresholds for cholesterol and blood pressure level)
+
 ```{r}
 
 nhanes_data <- nhanes
@@ -87,11 +89,11 @@ nhanes_data <- nhanes
 #discretize columns related to Cholesterol and blood pressure
 nhanes_data$tchol_cat <- cut(nhanes_data$tchol, 
                              breaks = c(0, 199, 239, Inf), 
-                             labels = c("HEALTHY", "AT-RISK", "DANGEROUS"))
+                             labels = c("Acceptable", "Borderline", "Abnormal"))
 
 nhanes_data$hdl_cat <- cut(nhanes_data$hdl, 
                            breaks = c(0, 39, 59, Inf), 
-                           labels = c("DANGEROUS", "AT-RISK", "HEALTHY"))
+                           labels = c("Abnormal", "Borderline", "Acceptable"))
 
 nhanes_data$sysbp_cat <- cut(nhanes_data$sysbp, 
                              breaks = c(-Inf, 119.9, 129.9, 139.9, 179.9, Inf),
