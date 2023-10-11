@@ -80,7 +80,7 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
   row_spec(0,bold=TRUE)
 ```
 
-From the table 1, we can realized that there are 6482 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease filally.
+From the table 1, we can realized that there are 6482 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally.
 ```{r}
 #exploratory average weight in every age grouped by gender
 gender<-nhanes%>%
@@ -96,11 +96,12 @@ gender<-nhanes%>%
    theme(plot.title = element_text(hjust = 0.5))
 ```
 
-For the observations in different marital status, we also interested in the relationship with weight.The following box plot shows that the average weight under different marital status are all around 80 Kg.
-
+For the observations in different marital status, we also interested in the relationship between weight and marital status.The following box plot shows that the average weight under different marital status are all around 80 Kg, widowed have lowest average weight among six categories.
 ```{r}
 #box plot for weight VS marital status
-ggplot(nhanes, aes(x=marstat, y=wt, fill=marstat))+
+Nhanes<-nhanes%>%
+  na.omit()
+ggplot(Nhanes, aes(x=marstat, y=wt, fill=marstat))+
         geom_boxplot() + 
         scale_fill_brewer(palette="Blues") +
         labs(title = "Plot for weight in each marital status", x="Marital Status", y="Weight (Kg)")+
