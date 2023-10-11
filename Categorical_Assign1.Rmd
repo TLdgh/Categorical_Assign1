@@ -80,21 +80,19 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
   row_spec(0,bold=TRUE)
 ```
 
-From the table 1, we can realized that there are 6482 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. This data set mainly focus on the observers between 16 to 80 years old. Among them, the number of 80-year-old is the largest among all ages, and as we can see from the bar chart that the number of men and women is similar.
-
+From the table 1, we can realized that there are 6482 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease filally.
 ```{r}
-#exploratory age and gender 
+#exploratory average weight in every age grouped by gender
 gender<-nhanes%>%
   group_by(gender,age)%>%
-  summarise(count=n())
-   ggplot(gender,aes(x=age, y=count), group=gender)+
-geom_bar(stat='identity',aes(fill=gender),position = position_dodge(0.7),width=0.7)+
-  scale_y_continuous(
-    labels = scales::comma
-  ) +
+  summarise(Avgwt=mean(wt,na.rm=TRUE))
+   ggplot(gender,aes(x=age, y=Avgwt), group=gender)+
+     geom_point(aes(colour=gender),size=1 )+
+     geom_line(aes(fill=gender,colour=gender,linetype=gender) )+
+      scale_y_continuous( labels = scales::comma  ) +
     theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45))+
-   scale_fill_manual(values=c("blue","red"))+
-   labs(title="Number of Observers in Different Age")+
+   
+   labs(title="Average weight in Different Age",x="Age", y="Average weight (Kg)")+
    theme(plot.title = element_text(hjust = 0.5))
 ```
 
