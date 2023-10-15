@@ -110,8 +110,33 @@ ggplot(Nhanes, aes(x=marstat, y=wt, fill=marstat))+
        )
 
   
+#boxplot for vigorous activities VS weight
+Nhanes<-nhanes%>%
+  mutate(vigrecexr = case_when(
+    (nhanes$vigrecexr %in% "Yes") ~ "Vigorous Recreational Activities",
+    (nhanes$vigrecexr %in% "No") ~ "Not Vigorous Recreational Activities"))%>%
+  na.omit()
+  ggplot(Nhanes, aes(x=vigwrk, y=wt, fill=vigwrk))+
+        geom_boxplot() + 
+       facet_wrap(~vigrecexr) +
+        scale_fill_brewer(palette="Blues") +
+        labs(title = "Plot for weight in Vigorous Work and Vigorous Activity", x=" Vigorous Work Activity", y="Weight (Kg)")+
+        theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
+              plot.title = element_text(hjust = 0.5)
+       )
+```
+
+In order to have improve understanding with the relationship between weight and other health related variables, we can categorize the weight level for every observation by BMI.
+```{r}
+# categorize the BMI level
+Bnhanes<-nhanes%>%
+  mutate(BMI_level = case_when(
+    
+  ))
 
 ```
+
+
 
 # Conclusion
 
