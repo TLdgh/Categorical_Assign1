@@ -140,11 +140,20 @@ Nhanes<-nhanes%>%
 
 In order to have improve understanding with the relationship between weight and other health related variables, we can categorize the weight level for every observation by BMI.
 ```{r}
-# categorize the BMI level
-Bnhanes<-nhanes%>%
+# categorize the BMI level (CDC standard) and age group (NIH standard)
+Catenhanes<-nhanes%>%
   mutate(BMI_level = case_when(
-    
-  ))
+    nhanes$bmi < 18.5 ~"Underweight",
+    nhanes$bmi < 25 ~"Healthy weight",
+    nhanes$bmi < 30 ~"Overweight",
+    nhanes$bmi < 35 ~"Class1 Obesity ",
+    nhanes$bmi < 40 ~"Class2 Obesity ",
+    nhanes$bmi >= 40 ~"Server Obesity"),
+   group=case_when(
+     nhanes$age < 18 ~ "Adolescents",
+     nhanes$age < 65 ~ "Adults",
+     nhanes$age >=65 ~ "Older Adults"
+   ))
 
 ```
 
