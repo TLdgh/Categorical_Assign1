@@ -80,6 +80,18 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
   row_spec(0,bold=TRUE)
 ```
 
+```{r}
+#Table 1
+#install.packages("tableone")
+library(tableone)
+#variables
+listvar<-c("gender","age","marstat","samplewt","psu","strata","tchol","hdl","sysbp","dbp","wt","ht","bmi","vigwrk","modwrk","wlkbik","vigrecexr","modrecexr","sedmin","obese")
+catvar<- c("gender","marstat","vigwrk","modwrk","wlkbik","vigrecexr","modrecexr","obese")
+#table
+table1<-CreateTableOne(vars=listvar, data=nhanes, factorVars=catvar)
+table1
+```
+
 From the table 1, we can realized that there are 6482 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally.
 ```{r}
 #exploratory average weight in every age grouped by gender
