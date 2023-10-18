@@ -84,6 +84,7 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
 
 ```{r}
 #Table 1 (Option 1)
+library(devtools)
 #install_github("emwozniak/Table1")
 library(Table1)
 make.table(dat          = nhanes,
