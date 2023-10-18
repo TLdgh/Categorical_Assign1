@@ -18,10 +18,12 @@ header-includes:
 bibliography: References.bib
 link-citations: yes
 ---
-
-
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
+library(plotly)
+library(tidyverse)
+library(kableExtra)
+library(aplore3)
 ```
 
 # Introduction
@@ -34,13 +36,10 @@ We aim to study the relationship between the weight variable and the other healt
 # Method
 We began our study by doing an exploratory analysis among the variables through various tables and charts. We then performed several hypothesis tests on some of the variables. Lastly we did a linear regression model fit to the response variable "weight" with other variables and confounders.
 
-```{r, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
-library(plotly)
-library(tidyverse)
-library(kableExtra)
-library(aplore3)
-```
+# Part 1: Exploratory Analysis
+We began our analysis by giving a data dictionary of the data shown in Table 1 below. As one can see that some variables have a high percentage of missing values. In Part 2 we made hypothesis tests to decide if some of these variables could be excluded from the regression analysis in Part 3. 
+
+The weight variable was a continuous random variable in our data. A simple way of categorizing it was to consider the BMI indicator. As one could see there was an obese variable in the data. The weight variable was categorized by giving a threshold of 35 to the BMI value. A person is considered healthy if the BMI is below 35, and obese otherwise. Therefore, we used the obese variable as the categorical random variable in our project. 
 
 ```{r}
 #create data variable definition
@@ -79,30 +78,42 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
   row_spec(0,bold=TRUE)
 ```
 
+# Part 2: Hypothesis Tests
+
 ```{r}
 IndepTest<-setRefClass(
   "IndepTest",
-  fields = list(data="data.frame", variable_x="character", variable_y="character",res="data.frame"),
+  fields = list(data="data.frame", variable_x="character", variable_y="character",res="list"),
   methods=list(
     initialize=function(data, variable_x, variable_y){
       #make a contingency table for the variable X and Y
-      .self$res<-data%>%select(all_of(c(variable_x, variable_y)))%>%na.omit()%>%
-        group_by(across(everything(), as.factor))%>%tally()%>%spread(key=variable_y, value=n)
-      print(res)
+      for(x in variable_x){
+        .self$res[[x]]<-data%>%select(all_of(c(x, variable_y)))%>%na.omit()%>%
+          group_by(across(everything(), as.factor))%>%tally()%>%spread(key=variable_y, value=n)}
     },
     
     get_pvalue=function(){
       #do the chi-squared test
-      test<-ungroup(res)%>%select(-any_of(group_vars(res)))%>%as.matrix()%>%chisq.test()
-      return(test$p.value)}
+      pvalues<-map(res, function(x){
+        y<-ungroup(x)%>%select(-any_of(group_vars(x)))%>%as.matrix()%>%chisq.test()
+        return(round(y$p.value, 3))
+      })
+      return(pvalues)}
   )
 )
 ```
 
 We first test the independence between obesity and marital status. We form the following contingency table:
 ```{r}
-test1<-IndepTest$new(nhanes, "marstat", "obese")
-pv<-test1$get_pvalue()
+test_marstat<-IndepTest$new(nhanes, "marstat", "obese")
+test_marstat$res$marstat%>%
+  rename("\t" = marstat) %>%
+  add_column(" " = c("Marital Status", rep(" ", nrow(.) - 1)), .before = "\t") %>%
+  kable(booktabs = TRUE,caption = "Contingency Table")%>%
+  kable_styling(font_size=10, latex_options=c("hold_position"))%>%
+  add_header_above(c(" " = 1, " " = 1, "Obesity" = 2))
+
+pv<-test_marstat$get_pvalue()
 ```
 
 Let X be the categorical random variable for Marital Status and Y be the one for Obesity. Define the count random variable $N_{ij}:=\sum_{i=1}^I\sum_{j=1}^J \mathbb{I}(X=i, Y=j)$, then the joint random variables $[N_{11}, ..., N_{IJ}]$ has a Multinomial distribution $\vec{p}=[p_{11}, ..., p_{IJ}]$. Our hypothesis test is therefore:
@@ -113,6 +124,17 @@ H_1:p_{ij} \neq p_{i.} \cdot p_{.j} ~ \forall i,j
 \end{gather*}
 
 We use the chi-squared test to conclude that there is not enough evidence to reject the null hypothesis with a p-value equal to `r pv`. In other words, we cannot conclude that there is a relationship between obesity and marital status.
+
+We do the same test for other variables compared with obesity:
+```{r}
+tests<-IndepTest$new(nhanes, c("vigwrk","modwrk","wlkbik","vigrecexr","modrecexr"), "obese")
+tests$get_pvalue()%>%data.frame(row.names = "p-value")%>%kable(booktabs = TRUE,caption = "p-values of Independence Tests between Different Variables and Obesity")%>%
+  kable_styling(latex_options=c("hold_position"))
+```
+
+From Table 2 we can see that we can reject the independence between obesity and wlkbik, vigrecexr and modrecexr variables.
+
+# Part 3: Regression Analysis
 
 # Conclusion
 
