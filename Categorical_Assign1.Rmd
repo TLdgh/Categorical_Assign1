@@ -81,7 +81,7 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
 ```
 
 ```{r}
-#Table 1
+#Table 1 (Option 1)
 #install_github("emwozniak/Table1")
 library(Table1)
 make.table(dat          = nhanes,
@@ -91,6 +91,43 @@ make.table(dat          = nhanes,
            colnames     = c(" ", "Not Obese", "Obese", "Overall"),
            caption      = "Table 1: Characteristics of the data set NHANES ",
            output       = "html")
+
+#Table 1 (Option 2)
+#install.packages("table1")
+library(table1)
+Bnhanes<-nhanes
+label(Bnhanes$gender) <- "Gender"
+label(Bnhanes$age)<-"Age"
+label(Bnhanes$marstat)<-"Marital Status"
+label(Bnhanes$samplewt)<-"Statistical Weight"
+label(Bnhanes$psu)<-"Pseudo-PSU"
+label(Bnhanes$strata)<-"Pseudo-stratum"
+label(Bnhanes$tchol)<-"Total Cholesterol"
+label(Bnhanes$hdl)<-"HDL-Cholesterol"
+label(Bnhanes$sysbp)<-"Systolic Blood Pressure"
+label(Bnhanes$dbp)<-"Diastolic Blood Pressure "
+label(Bnhanes$wt)<-"Weight"
+label(Bnhanes$ht)<-"Standing Height"
+label(Bnhanes$bmi)<-"Body mass Index"
+label(Bnhanes$vigwrk)<-"Vigorous Work Activity"
+label(Bnhanes$modwrk)<-"Moderate Work Activity "
+label(Bnhanes$wlkbik)<-"Walk or Bicycle "
+label(Bnhanes$vigrecexr)<-"Vigorous Recreational Activities "
+label(Bnhanes$modrecexr)<-"Moderate Recreational Activities"
+label(Bnhanes$sedmin)<-"Minutes of Sedentary Activity per Week "
+label(Bnhanes$obese)<-"Obese "
+
+units(Bnhanes$age) <- "years"
+units(Bnhanes$tchol) <- "mg/dL"
+units(Bnhanes$hdl) <- "mg/dL"
+units(Bnhanes$sysbp) <- "mm Hg"
+units(Bnhanes$dbp) <- "mm Hg"
+units(Bnhanes$wt) <- "Kg"
+units(Bnhanes$ht) <- "cm"
+units(Bnhanes$bmi) <- "Kg/m^2"
+units(Bnhanes$sedmin) <- "mins"
+
+table1 (~ age+marstat+samplewt+psu+strata+tchol+hdl+sysbp+dbp+wt+ht+vigwrk+modwrk+wlkbik+vigrecexr+modrecexr+sedmin+obese | gender, data=Bnhanes)
 ```
 
 From the table 1, we can realized that there are 6482 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally.
