@@ -118,6 +118,9 @@ knitr::kable(examples_data,
 library(knitr)
 library(kableExtra)
 
+# Categorize weight based on BMI
+nhanes_data$weight_category <- ifelse(nhanes_data$bmi < 35, "Healthy", "Obese")
+
 # Omit rows with any NA values
 nhanes_data_clean <- nhanes_data[complete.cases(nhanes_data), ]
 
@@ -163,8 +166,6 @@ knitr::kable(summary_table,
              col.names = c('Sample Characteristic', 'Total', 'Healthy (BMI < 35)', 'Obese (BMI >= 35)'))
 
 ```
-
-
 
 # Conclusion
 
