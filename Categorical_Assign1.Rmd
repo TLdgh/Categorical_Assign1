@@ -80,6 +80,8 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
   row_spec(0,bold=TRUE)
 ```
 
+
+
 ```{r}
 #Table 1 (Option 1)
 #install_github("emwozniak/Table1")
