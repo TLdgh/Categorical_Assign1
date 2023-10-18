@@ -83,22 +83,18 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
 
 
 ```{r}
-#Table 1 (Option 1)
-library(devtools)
-#install_github("emwozniak/Table1")
-library(Table1)
-make.table(dat          = nhanes,
-           strat        = "obese",
-           cat.varlist  = c("gender","marstat","vigwrk","modwrk","wlkbik","vigrecexr","modrecexr"),
-           cont.varlist = c("age","samplewt","psu","strata","tchol","hdl","sysbp","dbp","wt","ht","bmi","sedmin"),
-           colnames     = c(" ", "Not Obese", "Obese", "Overall"),
-           caption      = "Table 1: Characteristics of the data set NHANES ",
-           output       = "html")
-
-#Table 1 (Option 2)
+#Table 1 
 #install.packages("table1")
 library(table1)
 Bnhanes<-nhanes
+Bnhanes<-mutate(Bnhanes,BMI_level = case_when(
+    Bnhanes$bmi < 18.5 ~"Underweight",
+    Bnhanes$bmi < 25 ~"Healthy weight",
+    Bnhanes$bmi < 30 ~"Overweight",
+    Bnhanes$bmi >= 30 ~"Obesity "))%>%
+    filter(!is.na(Bnhanes$bmi))
+  
+  
 label(Bnhanes$gender) <- "Gender"
 label(Bnhanes$age)<-"Age"
 label(Bnhanes$marstat)<-"Marital Status"
@@ -130,10 +126,10 @@ units(Bnhanes$ht) <- "cm"
 units(Bnhanes$bmi) <- "Kg/m^2"
 units(Bnhanes$sedmin) <- "mins"
 
-table1 (~ age+marstat+samplewt+psu+strata+tchol+hdl+sysbp+dbp+wt+ht+vigwrk+modwrk+wlkbik+vigrecexr+modrecexr+sedmin+obese | gender, data=Bnhanes)
+table1 (~ gender+age+marstat+samplewt+psu+strata+tchol+hdl+sysbp+dbp+wt+ht+vigwrk+modwrk+wlkbik+vigrecexr+modrecexr+sedmin+obese | BMI_level, data=Bnhanes)
 ```
 
-From the table 1, we can realized that there are 6482 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally.
+From the table 1, we can realized that there are 6445 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. But in original data set, it exists 6482 observations and 37 of them are missing information for variable bmi. We deleted these missing data and use BMI level to stratified observations, since the missind data less than 0.6% in total. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally.
 ```{r}
 #exploratory average weight in every age grouped by gender
 gender<-nhanes%>%
@@ -142,11 +138,17 @@ gender<-nhanes%>%
    ggplot(gender,aes(x=age, y=Avgwt), group=gender)+
      geom_point(aes(colour=gender),size=1 )+
      geom_line(aes(fill=gender,colour=gender,linetype=gender) )+
+     geom_hline(yintercept = 86.2, linetype="dotted", size = 0.5)+
+     geom_hline(yintercept = 74.9, linetype="dotted", size = 0.5)+
+     annotate("text", y=86.2, x=18, label=" Male Avg.")+
+     annotate("text", y=74.9, x=18, label="Female Avg.")+
       scale_y_continuous( labels = scales::comma  ) +
     theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45))+
    
    labs(title="Average Weight in Different Age",x="Age", y="Average weight (Kg)")+
    theme(plot.title = element_text(hjust = 0.5))
+      
+    
 ```
 
 For the observations in different marital status, we also interested in the relationship between weight and marital status.The following box plot shows that the average weight under different marital status are all around 80 Kg, widowed have lowest average weight among six categories.
@@ -174,6 +176,21 @@ Nhanes<-nhanes%>%
        facet_wrap(~vigrecexr) +
         scale_fill_brewer(palette="Blues") +
         labs(title = "Plot for weight in Vigorous Work and Recreational Activity", x=" Vigorous Work Activity", y="Weight (Kg)")+
+        theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
+              plot.title = element_text(hjust = 0.5)
+       )
+  
+  #boxplot for Moderate activities VS weight
+Nhanes<-nhanes%>%
+  mutate(modrecexr = case_when(
+    (nhanes$modrecexr %in% "Yes") ~ "Moderate Recreational Activities",
+    (nhanes$modrecexr %in% "No") ~ "Not Moderate Recreational Activities"))%>%
+  na.omit()
+  ggplot(Nhanes, aes(x=modwrk, y=wt, fill=modwrk))+
+        geom_boxplot() + 
+       facet_wrap(~modrecexr) +
+        scale_fill_brewer(palette="Blues") +
+        labs(title = "Plot for weight in Moderate Work and Recreational Activity", x=" Moderate Work Activity", y="Weight (Kg)")+
         theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
               plot.title = element_text(hjust = 0.5)
        )
