@@ -79,59 +79,40 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
   row_spec(0,bold=TRUE)
 ```
 
+```{r}
+IndepTest<-setRefClass(
+  "IndepTest",
+  fields = list(data="data.frame", variable_x="character", variable_y="character",res="data.frame"),
+  methods=list(
+    initialize=function(data, variable_x, variable_y){
+      #make a contingency table for the variable X and Y
+      .self$res<-data%>%select(all_of(c(variable_x, variable_y)))%>%na.omit()%>%
+        group_by(across(everything(), as.factor))%>%tally()%>%spread(key=variable_y, value=n)
+      print(res)
+    },
+    
+    get_pvalue=function(){
+      #do the chi-squared test
+      test<-ungroup(res)%>%select(-any_of(group_vars(res)))%>%as.matrix()%>%chisq.test()
+      return(test$p.value)}
+  )
+)
+```
+
 We first test the independence between obesity and marital status. We form the following contingency table:
-
 ```{r}
-data1<-nhanes%>%select(wt, marstat, obese)%>%na.omit()
-head(data1)
-
-data1%>%group_by(across(marstat:obese, as.factor))%>%tally()%>%spread(key=obese, value=n)%>%
-  rename("\t" = marstat) %>% 
-  add_column(" " = c("Marital Status", rep(" ", nrow(.) - 1)), .before = "\t") %>% 
-  kable(booktabs = TRUE,caption = "Contingency Table")%>%
-  kable_styling(font_size=10, latex_options=c("hold_position"), full_width = F)%>%
-  add_header_above(c(" " = 1, " " = 1, "Obesity" = 2))
+test1<-IndepTest$new(nhanes, "marstat", "obese")
+pv<-test1$get_pvalue()
 ```
 
-Given the categories of marriage, we are interested in the number of obese people in each category. We have six categories in total. This forms a Multinomial random variable $\vec{X}=(X_1,... ,X_6)$ where each $X_i$ is the number of obese people in category i. We get the estimates of the MLEs for the corresponding proportions:
-```{r}
-df1<-data1%>%group_by(across(marstat:obese, as.factor))%>%tally()%>%spread(key=obese, value=n)%>%mutate(p_mle=Yes/sum(No+Yes))
-df1
-```
-The covariance matrix of the MLE is:
-$$
-Cov(\hat{p_1}, \hat{p_2})=
-\begin{bmatrix}
-\frac{p_1(1-p_1)}{n_1} & ... &  -\frac{n}{n_1n_k}p_1p_k\\
--\frac{n}{n_kn_1} p_1p_k & ... & \frac{p_k(1-p_k)}{n_k}
-\end{bmatrix}
-$$
-
-```{r}
-cov<-matrix(rep(0,36), nrow = 6, dimnames = list(df1$marstat,df1$marstat))
-
-for(i in 1:6){
-  for(j in 1:6){
-    if(i==j){cov[i,j]<-as.numeric(df1[i, "p_mle"]*(1-df1[i, "p_mle"]))/sum(df1[i, c("No", "Yes")])}
-    else{cov[i,j]<- -as.numeric(sum(df1[, c("No", "Yes")])/(sum(df1[i, c("No", "Yes")])*sum(df1[j, c("No", "Yes")]))*df1[i, "p_mle"]*df1[j, "p_mle"])}
-  }
-}
-cov%>%round(6)
-```
-
-We are interested in testing the following hypothesis:
+Let X be the categorical random variable for Marital Status and Y be the one for Obesity. Define the count random variable $N_{ij}:=\sum_{i=1}^I\sum_{j=1}^J \mathbb{I}(X=i, Y=j)$, then the joint random variables $[N_{11}, ..., N_{IJ}]$ has a Multinomial distribution $\vec{p}=[p_{11}, ..., p_{IJ}]$. Our hypothesis test is therefore:
 
 \begin{gather*}
-H_0: p\\
-H_1:p2
+H_0: p_{ij}= p_{i.} \cdot p_{.j} ~ \forall i,j\\
+H_1:p_{ij} \neq p_{i.} \cdot p_{.j} ~ \forall i,j
 \end{gather*}
 
-
-
-
-
-
-
+We use the chi-squared test to conclude that there is not enough evidence to reject the null hypothesis with a p-value equal to `r pv`. In other words, we cannot conclude that there is a relationship between obesity and marital status.
 
 # Conclusion
 
