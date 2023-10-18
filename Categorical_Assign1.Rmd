@@ -118,6 +118,9 @@ knitr::kable(examples_data,
 library(knitr)
 library(kableExtra)
 
+# Omit rows with any NA values
+nhanes_data_clean <- nhanes_data[complete.cases(nhanes_data), ]
+
 # Function to generate detailed statistics for a given variable
 
 generate_detailed_summary <- function(var_name, data) {
@@ -148,6 +151,9 @@ generate_detailed_summary <- function(var_name, data) {
   rbind(primary_heading, do.call(rbind, summaries))
 }
 
+vars_to_summarize <- c("gender", "marstat", "psu", "vigwrk", "modwrk", "wlkbik", "vigrecexr", "modrecexr", 
+                       "tchol_cat", "hdl_cat", "sysbp_cat", "dbp_cat")
+
 summary_table <- do.call(rbind, lapply(vars_to_summarize, generate_detailed_summary, data = nhanes_data_clean))
 knitr::kable(summary_table, 
              caption = "Table 1: Descriptive Summary by Weight Category", 
@@ -157,6 +163,7 @@ knitr::kable(summary_table,
              col.names = c('Sample Characteristic', 'Total', 'Healthy (BMI < 35)', 'Obese (BMI >= 35)'))
 
 ```
+
 
 
 # Conclusion
