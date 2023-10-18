@@ -82,14 +82,15 @@ DataDict%>%remove_rownames()%>%kable(booktabs = TRUE,caption = "Data Variable De
 
 ```{r}
 #Table 1
-#install.packages("tableone")
-library(tableone)
-#variables
-listvar<-c("gender","age","marstat","samplewt","psu","strata","tchol","hdl","sysbp","dbp","wt","ht","bmi","vigwrk","modwrk","wlkbik","vigrecexr","modrecexr","sedmin","obese")
-catvar<- c("gender","marstat","vigwrk","modwrk","wlkbik","vigrecexr","modrecexr","obese")
-#table
-table1<-CreateTableOne(vars=listvar, data=nhanes, factorVars=catvar)
-table1
+#install_github("emwozniak/Table1")
+library(Table1)
+make.table(dat          = nhanes,
+           strat        = "obese",
+           cat.varlist  = c("gender","marstat","vigwrk","modwrk","wlkbik","vigrecexr","modrecexr"),
+           cont.varlist = c("age","samplewt","psu","strata","tchol","hdl","sysbp","dbp","wt","ht","bmi","sedmin"),
+           colnames     = c(" ", "Not Obese", "Obese", "Overall"),
+           caption      = "Table 1: Characteristics of the data set NHANES ",
+           output       = "html")
 ```
 
 From the table 1, we can realized that there are 6482 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally.
