@@ -170,7 +170,7 @@ Nhanes<-nhanes%>%
         geom_boxplot() + 
        facet_wrap(~vigrecexr) +
         scale_fill_brewer(palette="Blues") +
-        labs(title = "Plot for weight in Vigorous Work and Vigorous Activity", x=" Vigorous Work Activity", y="Weight (Kg)")+
+        labs(title = "Plot for weight in Vigorous Work and Recreational Activity", x=" Vigorous Work Activity", y="Weight (Kg)")+
         theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
               plot.title = element_text(hjust = 0.5)
        )
