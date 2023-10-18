@@ -18,19 +18,20 @@ bibliography: References.bib
 link-citations: yes
 ---
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
 # Introduction
-We were given the data set of The National Health and Nutrition Examination Survey (NHANES). The survey program has been conducted as a series of surveys designed to assess the health and nutritional status of adults and children in the United States since the 1960s, according to CDC [@CDC]. It combines in-person face-to-face interviews and physical examinations of participants for data collection. 
 
-The survey data wasn't a simple random sample, however. According to CDC's National Health and Nutrition Examination Survey: Plan and Operations, 1999–2010 [@SurveyDesign], the sampling strategy consists of several stages: 1. Selection of counties as primary sampling units (PSU). 2. selection of segments within PSUs that constitute blocks of households. 3. Selection of specific households within segments. 4. Selection of individuals within a household. 
+We were given the data set of The National Health and Nutrition Examination Survey (NHANES). The survey program has been conducted as a series of surveys designed to assess the health and nutritional status of adults and children in the United States since the 1960s, according to CDC [@CDC]. It combines in-person face-to-face interviews and physical examinations of participants for data collection.
 
-We aim to study the relationship between the weight variable and the other health related variables of the data. 
+The survey data wasn't a simple random sample, however. According to CDC's National Health and Nutrition Examination Survey: Plan and Operations, 1999--2010 [@SurveyDesign], the sampling strategy consists of several stages: 1. Selection of counties as primary sampling units (PSU). 2. selection of segments within PSUs that constitute blocks of households. 3. Selection of specific households within segments. 4. Selection of individuals within a household.
+
+We aim to study the relationship between the weight variable and the other health related variables of the data.
 
 # Method
+
 We began our study by doing an exploratory analysis among the variables through various tables and charts. We then performed several hypothesis tests on some of the variables. Lastly we did a linear regression model fit to the response variable "weight" with other variables and confounders.
 
 ```{r, include=FALSE}
@@ -113,12 +114,49 @@ knitr::kable(examples_data,
              align = "c")
 ```
 
+```{r}
+library(knitr)
+library(kableExtra)
 
+# Function to generate detailed statistics for a given variable
 
+generate_detailed_summary <- function(var_name, data) {
+  # Remove the "_cat" suffix
+  display_var_name <- gsub("_cat", "", var_name)
+  
+  levels_of_var <- unique(data[[var_name]])
+  summaries <- lapply(levels_of_var, function(level) {
+    total_count <- sum(data[[var_name]] == level, na.rm = TRUE)
+    total_percentage <- (total_count / nrow(data)) * 100
+    
+    healthy_count <- sum(data[[var_name]][data$weight_category == "Healthy"] == level, na.rm = TRUE)
+    healthy_percentage <- (healthy_count / sum(data$weight_category == "Healthy", na.rm = TRUE)) * 100
+    
+    obese_count <- sum(data[[var_name]][data$weight_category == "Obese"] == level, na.rm = TRUE)
+    obese_percentage <- (obese_count / sum(data$weight_category == "Obese", na.rm = TRUE)) * 100
+    
+    data.frame(
+      SampleCharacteristic = as.character(level),
+      Total = paste0(total_count, " (", sprintf("%.2f", total_percentage), "%)"),
+      Healthy = paste0(healthy_count, " (", sprintf("%.2f", healthy_percentage), "%)"),
+      Obese = paste0(obese_count, " (", sprintf("%.2f", obese_percentage), "%)")
+    )
+  })
+  
+  # Add the primary heading for the variable, bolded
+  primary_heading <- data.frame(SampleCharacteristic = paste0("**", display_var_name, "**"), Total = "", Healthy = "", Obese = "")
+  rbind(primary_heading, do.call(rbind, summaries))
+}
 
+summary_table <- do.call(rbind, lapply(vars_to_summarize, generate_detailed_summary, data = nhanes_data_clean))
+knitr::kable(summary_table, 
+             caption = "Table 1: Descriptive Summary by Weight Category", 
+             align = c('l', 'c', 'c', 'c'),
+             row.names = FALSE, 
+             format.args = list(big.mark = ","),
+             col.names = c('Sample Characteristic', 'Total', 'Healthy (BMI < 35)', 'Obese (BMI >= 35)'))
 
-
-
+```
 
 
 # Conclusion
