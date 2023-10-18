@@ -31,7 +31,7 @@ The survey data wasn't a simple random sample, however. According to CDC's Natio
 We aim to study the relationship between the weight variable and the other health related variables of the data.
 
 # Method
-
+## Data Visualization
 We began our study by doing an exploratory analysis among the variables through various tables and charts. We then performed several hypothesis tests on some of the variables. Lastly we did a linear regression model fit to the response variable "weight" with other variables and confounders.
 
 ```{r, include=FALSE}
