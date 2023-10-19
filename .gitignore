@@ -14,6 +14,7 @@ Categorical_Assign1.Rproj
 *.log
 *.tex
 Figures/*_files/
+Categorical_Assign1_files
 
 # knitr and R markdown default cache directories
 *_cache/
