@@ -167,6 +167,18 @@ knitr::kable(summary_table,
 
 ```
 
+##Part 3: Survey weights in complex survey designs
+Direct sampling of individual elements is often emphasized when working with a list frame that identifies all population elements. However, in large-scale surveys, creating such a list frame can be impractical due to non-availability or prohibitive costs. Additionally, if the population elements are dispersed over a vast area, direct sampling might lead to excessive fieldwork costs. In such instances, cluster sampling becomes a viable alternative.\
+\
+Most large-scale surveys often involve a combination of multiple sampling design techniques, like cluster sampling and stratification, enable researchers to obtain accurate estimates while catering to practical and cost considerations. A central tenet to these designs is the concept of sampling weights, pivotal in ensuring unbiased estimation.\
+\
+Sampling weights are best defined as the inverse of the probability that a specific unit gets selected in the sample. These weights adjust for design-imposed inequalities in selection probabilities and compute point estimates.\
+\
+
+(Cluster sampling)
+
+(Weight in cluster sampling)
+
 # Conclusion
 
 # References
