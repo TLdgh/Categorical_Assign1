@@ -167,7 +167,7 @@ tests$get_pvalue()%>%
   kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")
 ```
 
-Based on thresholds established by clinicians, we categorizing four variables related to the cholesterol and blood pressure level. 
+Based on thresholds established by clinicians, we categorizing four variables related to the cholesterol and blood pressure level.
 
 Cholesterol is an essential fat in the body. According to American Heart Association, We have: tchol of 240mg/dl or higher OR hdl under 40mg/dL as Dangerous Cholesterol level; tchol between 200-239mg/dL OR hdl between 40-59mg/dL for males OR between 50-59mg/dL for females as at risk level; tchol under 200mg/dL and hdl of 60mg/dL and higher as healthy level.
 
@@ -204,68 +204,33 @@ nhanes_data$bp_category <- with(nhanes_data, ifelse(
 head(nhanes_data[, c("sysbp", "dbp", "bp_category")])
 ```
 
-```{r}
-library(knitr)
-library(kableExtra)
+## Exrtra topic: Survey weights in complex survey designs
 
-# Categorize weight based on BMI
-nhanes_data$weight_category <- ifelse(nhanes_data$bmi < 35, "Healthy", "Obese")
+Most large-scale surveys often involve a combination of multiple sampling design techniques, like stratification and cluster sampling, enable researchers to obtain accurate estimates while catering to practical and cost considerations. A central tenet to these designs is the concept of sampling weights, pivotal in ensuring unbiased estimation.
 
-# Omit rows with any NA values
-nhanes_data_clean <- nhanes_data[complete.cases(nhanes_data), ]
+Sampling weights are best defined as the inverse of the probability that a specific unit gets selected in the sample. These weights adjust for design-imposed inequalities in selection probabilities and are used tp compute point estimates.
 
-# Function to generate detailed statistics for a given variable
+In the case of the stratified random sampling. The population U of size N is partitioned into stratums denoted by $U_1,...,U_h,...,U_H$. The size of $h$th stratum is denoted by $N_h$.In stratum $h$, a random sample $S_h$ of size $n_h$ is selected based on a sampling design, here we use simple random sampling for simplicity and efficiency. In this stratified random sampling, the estimate of population total can be show as following:
 
-generate_detailed_summary <- function(var_name, data) {
-  # Remove the "_cat" suffix
-  display_var_name <- gsub("_cat", "", var_name)
-  
-  levels_of_var <- unique(data[[var_name]])
-  summaries <- lapply(levels_of_var, function(level) {
-    total_count <- sum(data[[var_name]] == level, na.rm = TRUE)
-    total_percentage <- (total_count / nrow(data)) * 100
-    
-    healthy_count <- sum(data[[var_name]][data$weight_category == "Healthy"] == level, na.rm = TRUE)
-    healthy_percentage <- (healthy_count / sum(data$weight_category == "Healthy", na.rm = TRUE)) * 100
-    
-    obese_count <- sum(data[[var_name]][data$weight_category == "Obese"] == level, na.rm = TRUE)
-    obese_percentage <- (obese_count / sum(data$weight_category == "Obese", na.rm = TRUE)) * 100
-    
-    data.frame(
-      SampleCharacteristic = as.character(level),
-      Total = paste0(total_count, " (", sprintf("%.2f", total_percentage), "%)"),
-      Healthy = paste0(healthy_count, " (", sprintf("%.2f", healthy_percentage), "%)"),
-      Obese = paste0(obese_count, " (", sprintf("%.2f", obese_percentage), "%)")
-    )
-  })
-  
-  # Add the primary heading for the variable, bolded
-  primary_heading <- data.frame(SampleCharacteristic = paste0("**", display_var_name, "**"), Total = "", Healthy = "", Obese = "")
-  rbind(primary_heading, do.call(rbind, summaries))
-}
+$\hat{t}_{str}=\sum_{h=1}^H\sum_{j\in S_h}w_{hj}y_{hj}$
 
-vars_to_summarize <- c("gender", "marstat", "psu", "vigwrk", "modwrk", "wlkbik", "vigrecexr", "modrecexr", 
-                       "tchol_cat", "hdl_cat", "sysbp_cat", "dbp_cat")
+where the $w_{hj}=N_h/n_h$ represents the sampling weight of the $j$th observation in the $h$th stratum, $y_{hj}$. Note that the probability of sample selection of the $j$th unit in the $h$th stratum is $\pi_{hj}=n_h/N_h$.In this case, the sampling weight is the inverse of such probability $\pi_{hj}$. The unbiased estimator of the population mean $\bar{y}_U$ can also be shown with sampling weight as following:
 
-summary_table <- do.call(rbind, lapply(vars_to_summarize, generate_detailed_summary, data = nhanes_data_clean))
-knitr::kable(summary_table, 
-             caption = "Table 1: Descriptive Summary by Weight Category", 
-             align = c('l', 'c', 'c', 'c'),
-             row.names = FALSE, 
-             format.args = list(big.mark = ","),
-             col.names = c('Sample Characteristic', 'Total', 'Healthy (BMI < 35)', 'Obese (BMI >= 35)'))
+$\hat{\bar{y}}_{str}=\frac{\sum_{h=1}^H\sum_{j\in S_h}w_{hj}y_{hj}}{\sum_{h=1}^H\sum_{j\in S_h}w_{hj}}$
 
-```
+Cluster sampling is another complex sampling technique for large-scale surveys when the population elements are dispersed and the the fieldwork is costly. We sample the primary sampling units(psu's) which are often from the natural groupings of the population elements. In cluster sampling, we have $N$ as the number of psu's in the population. $i$th psu contains $M_i$ elements. For sample of psu's, $S$, We denote $n$ as the number of psu's in the sample. For a two-stage cluster sampling, a $S_i$ sub-sample of secondary sampling units(ssu's) is chosen from $i$th psu, $i=1,...,n$. The sub-sample size is $m_i$.
 
-##Part 3: Survey weights in complex survey designs Direct sampling of individual elements is often emphasized when working with a list frame that identifies all population elements. However, in large-scale surveys, creating such a list frame can be impractical due to non-availability or prohibitive costs. Additionally, if the population elements are dispersed over a vast area, direct sampling might lead to excessive fieldwork costs. In such instances, cluster sampling becomes a viable alternative.
+In the case of two-stage cluster sampling with equal probabilities, the sampling weight can be expressed as the following: $w_{ij}=1/\pi_{ij}=\frac{NM_i}{nm_i}$, where $\pi_{ij}$ is the probability that the $j$th ssu in the $i$th psu is in the sample. For unequal probabilities, we need the probability that the $i$th psu is in the sample,$\pi_i$, and the probability that the $j$th ssu is in the sample given that the $i$th psu is in the sample, $\pi_{j|i}$. Then, the sampling weight is given by $w_{ij}=1/(\pi_i\pi_{j|i})$.
 
-Most large-scale surveys often involve a combination of multiple sampling design techniques, like cluster sampling and stratification, enable researchers to obtain accurate estimates while catering to practical and cost considerations. A central tenet to these designs is the concept of sampling weights, pivotal in ensuring unbiased estimation.
+With the sampling weight shown above, the estimator of the population total in cluster sampling can also be show in the following forms:
 
-Sampling weights are best defined as the inverse of the probability that a specific unit gets selected in the sample. These weights adjust for design-imposed inequalities in selection probabilities and compute point estimates.
+$\hat{t}=\sum_{i\in S}\sum_{j\in S_i}w_{ij}y_{ij}$
 
-(Cluster sampling)
+and the estimator of the population mean:
 
-(Weight in cluster sampling)
+$\hat{\bar{y}}=\frac{\sum_{i\in S}\sum_{j\in S_i}w_{ij}y_{ij}}{\sum_{i\in S}\sum_{j\in S_i}w_{ij}}$
+
+In essence, sampling weights in complex survey designs play a crucial role in ensuring that the survey results are both accurate and generalizable to the broader population.
 
 ## Conclusion
 
