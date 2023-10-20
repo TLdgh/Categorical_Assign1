@@ -13,6 +13,7 @@ bibliography: References.bib
 link-citations: yes
 ---
 
+```{=html}
 <style type="text/css">
 body{
 font-size: 12pt;
@@ -21,7 +22,7 @@ table{
 font-size: 12pt;
 }
 </style>
-
+```
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 library(plotly)
@@ -31,19 +32,22 @@ library(aplore3)
 ```
 
 ## Introduction
-We were given the data set of The National Health and Nutrition Examination Survey (NHANES). The survey program has been conducted as a series of surveys designed to assess the health and nutritional status of adults and children in the United States since the 1960s, according to CDC [@CDC]. It combines in-person face-to-face interviews and physical examinations of participants for data collection. 
 
-The survey data wasn't a simple random sample, however. According to CDC's National Health and Nutrition Examination Survey: Plan and Operations, 1999–2010 [@SurveyDesign], the sampling strategy consists of several stages: 1. Selection of counties as primary sampling units (PSU). 2. selection of segments within PSUs that constitute blocks of households. 3. Selection of specific households within segments. 4. Selection of individuals within a household. 
+We were given the data set of The National Health and Nutrition Examination Survey (NHANES). The survey program has been conducted as a series of surveys designed to assess the health and nutritional status of adults and children in the United States since the 1960s, according to CDC [@CDC]. It combines in-person face-to-face interviews and physical examinations of participants for data collection.
+
+The survey data wasn't a simple random sample, however. According to CDC's National Health and Nutrition Examination Survey: Plan and Operations, 1999--2010 [@SurveyDesign], the sampling strategy consists of several stages: 1. Selection of counties as primary sampling units (PSU). 2. selection of segments within PSUs that constitute blocks of households. 3. Selection of specific households within segments. 4. Selection of individuals within a household.
 
 We aim to study the relationship between the weight variable and the other health related variables of the data.
 
 ## Method
+
 We began our study by doing an exploratory analysis among the variables through various tables and charts. We then performed several hypothesis tests on some of the variables. Lastly we did a linear regression model fit to the response variable "weight" with other variables and confounders.
 
 ## Part 1: Exploratory Analysis
-We began our analysis by giving a data dictionary of the data shown in Table 1 below. As one can see that some variables have a high percentage of missing values. In Part 2 we made hypothesis tests to decide if some of these variables could be excluded from the regression analysis in Part 3. 
 
-The weight variable was a continuous random variable in our data. A simple way of categorizing it was to consider the BMI indicator. As one could see there was an obese variable in the data. The weight variable was categorized by giving a threshold of 35 to the BMI value. A person is considered healthy if the BMI is below 35, and obese otherwise. Therefore, we used the obese variable as the categorical random variable in our project. 
+We began our analysis by giving a data dictionary of the data shown in Table 1 below. As one can see that some variables have a high percentage of missing values. In Part 2 we made hypothesis tests to decide if some of these variables could be excluded from the regression analysis in Part 3.
+
+The weight variable was a continuous random variable in our data. A simple way of categorizing it was to consider the BMI indicator. As one could see there was an obese variable in the data. The weight variable was categorized by giving a threshold of 35 to the BMI value. A person is considered healthy if the BMI is below 35, and obese otherwise. Therefore, we used the obese variable as the categorical random variable in our project.
 
 ```{r}
 #create data variable definition
@@ -81,7 +85,7 @@ DataDict%>%remove_rownames()%>%kable(caption = "Data Variable Definition")%>%
   row_spec(0,bold=TRUE)
 ```
 
-According to CDC's classification on bodyweight, we have: BMI<18.5 as Underweight, BMI between 18.5 and 24.9 as Health, BMI between 25 and 29.9 as Overweight, and BMI>30 as obesity. We adopted this category and found that there was a slight positive relationship between bodyweight and the total cholesterol level. However, we noticed that there was a negative relationship between the HDL and bodyweight. Because of the fact that Tchol is the sum of HDL and LDL, we can conclude that the obese population has a high level of LDL and a low level HDL.
+According to CDC's classification on bodyweight, we have: BMI\<18.5 as Underweight, BMI between 18.5 and 24.9 as Health, BMI between 25 and 29.9 as Overweight, and BMI\>30 as obesity. We adopted this category and found that there was a slight positive relationship between bodyweight and the total cholesterol level. However, we noticed that there was a negative relationship between the HDL and bodyweight. Because of the fact that Tchol is the sum of HDL and LDL, we can conclude that the obese population has a high level of LDL and a low level HDL.
 
 ```{r}
 nhanes%>%mutate(CDC_obese=case_when(
@@ -130,6 +134,7 @@ IndepTest<-setRefClass(
 ```
 
 We first test the independence between obesity and marital status. We form the following contingency table:
+
 ```{r}
 test_marstat<-IndepTest$new(nhanes, "marstat", "obese")
 test_marstat$res$marstat%>%
@@ -145,11 +150,12 @@ pv<-test_marstat$get_pvalue()%>%as.numeric()
 
 Let X be the categorical random variable for Marital Status and Y be the one for Obesity. Assuming a random sample of n trials. Define the count random variable $N_{ij}:=\sum_{k=1}^n \mathbf{I}_k(X=i, Y=j)$ where $\mathbf{I}_k$ is the indicator function for the k-th trial, then the joint random variables $[N_{11}, ..., N_{IJ}]$ has a Multinomial distribution $\vec{p}=[p_{11}, ..., p_{IJ}]$. Our hypothesis test is therefore:
 
+```{=tex}
 \begin{gather*}
 H_0: p_{ij}= p_{i+} \cdot p_{+j} ~ \forall i,j\\
 H_1:p_{ij} \neq p_{i+} \cdot p_{+j} ~ \forall i,j
 \end{gather*}
-
+```
 We use the chi-squared test to conclude that there is not enough evidence to reject the null hypothesis with a p-value equal to `r pv`. In other words, we cannot conclude that there is a relationship between obesity and marital status.
 
 We do the same test for other variables compared with obesity. From Table 2 we can see that we can reject the independence between obesity and wlkbik, vigrecexr and modrecexr variables.
@@ -161,39 +167,41 @@ tests$get_pvalue()%>%
   kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")
 ```
 
-Based on thresholds established by clinicians, we categorizing four variables related to the cholesterol and blood pressure level.
+Based on thresholds established by clinicians, we categorizing four variables related to the cholesterol and blood pressure level. 
 
-(add two tables showing the thresholds for cholesterol and blood pressure level)
+Cholesterol is an essential fat in the body. According to American Heart Association, We have: tchol of 240mg/dl or higher OR hdl under 40mg/dL as Dangerous Cholesterol level; tchol between 200-239mg/dL OR hdl between 40-59mg/dL for males OR between 50-59mg/dL for females as at risk level; tchol under 200mg/dL and hdl of 60mg/dL and higher as healthy level.
+
+Blood pressure is typically categorized into different stages based on the systolic (top number) and diastolic (bottom number) readings. According to American Heart Association, We have: systolic level less than 120mm Hg and diastolic level less than 80mm Hg as normal blood pressure; systolic level between 120-129mm Hg and diastolic level less than 80mm Hg as elevated blood pressure; systolic level between 130-139mm Hg OR diastolic level between 80-89mm Hg as Hypertension Stage 1; systolic level 140mm Hg or higher OR diastolic level 90mm Hg or higher as Hypertension Stage 2; systolic level higher than 180mm Hg OR diastolic level higher than 120mm Hg as Hypertensive Crisis.
 
 ```{r}
 
 nhanes_data <- nhanes
 
-#discretize columns related to Cholesterol and blood pressure
-nhanes_data$tchol_cat <- cut(nhanes_data$tchol, 
-                             breaks = c(0, 199, 239, Inf), 
-                             labels = c("Acceptable", "Borderline", "Abnormal"))
+# Categorizing cholesterol levels
+nhanes_data$chol_category <- with(nhanes_data, ifelse(
+  tchol >= 240 | hdl < 40, "Dangerous",
+  ifelse(
+    tchol >= 200 & tchol < 240 | 
+    (gender == "Male" & hdl >= 40 & hdl < 60) |  # Male and HDL between 40-59
+    (gender == "Female" & hdl >= 50 & hdl < 60),   # Female and HDL between 50-59
+    "At Risk",
+    "Healthy"
+  )
+))
 
-nhanes_data$hdl_cat <- cut(nhanes_data$hdl, 
-                           breaks = c(0, 39, 59, Inf), 
-                           labels = c("Abnormal", "Borderline", "Acceptable"))
+# Preview the updated variable
+head(nhanes_data[, c("gender","tchol", "hdl", "chol_category")])
 
-nhanes_data$sysbp_cat <- cut(nhanes_data$sysbp, 
-                             breaks = c(-Inf, 119.9, 129.9, 139.9, 179.9, Inf),
-                             labels = c("NORMAL", "ELEVATED", "HYPERTENSION STAGE 1", 
-                                        "HYPERTENSION STAGE 2", "HYPERTENSIVE CRISIS"))
+# Categorizing blood pressure
+nhanes_data$bp_category <- with(nhanes_data, ifelse(
+  sysbp < 120 & dbp < 80, "Normal",
+  ifelse(sysbp >= 120 & sysbp <= 129 & dbp < 80, "Elevated",
+  ifelse((sysbp >= 130 & sysbp <= 139) | (dbp >= 80 & dbp <= 89), "Hypertension Stage 1",
+  ifelse(sysbp >= 140 | dbp >= 90, "Hypertension Stage 2",
+  ifelse(sysbp > 180 | dbp > 120, "Hypertensive Crisis", NA))))))
 
-nhanes_data$dbp_cat <- cut(nhanes_data$dbp, 
-                           breaks = c(-Inf, 79.9, 89.9, 119.9, Inf),
-                           labels = c("NORMAL", "HYPERTENSION STAGE 1", 
-                                      "HYPERTENSION STAGE 2", "HYPERTENSIVE CRISIS"))
-
-#show example of modified data'
-set.seed(123)
-examples_data <- nhanes_data[sample(nrow(nhanes_data), 5), c("tchol", "tchol_cat", "hdl", "hdl_cat", "sysbp", "sysbp_cat", "dbp", "dbp_cat")]
-knitr::kable(examples_data, 
-             caption = "Examples of Original and Discretized Health Metrics",
-             align = "c")
+# Preview the new variable
+head(nhanes_data[, c("sysbp", "dbp", "bp_category")])
 ```
 
 ```{r}
@@ -249,13 +257,11 @@ knitr::kable(summary_table,
 
 ```
 
-##Part 3: Survey weights in complex survey designs
-Direct sampling of individual elements is often emphasized when working with a list frame that identifies all population elements. However, in large-scale surveys, creating such a list frame can be impractical due to non-availability or prohibitive costs. Additionally, if the population elements are dispersed over a vast area, direct sampling might lead to excessive fieldwork costs. In such instances, cluster sampling becomes a viable alternative.
+##Part 3: Survey weights in complex survey designs Direct sampling of individual elements is often emphasized when working with a list frame that identifies all population elements. However, in large-scale surveys, creating such a list frame can be impractical due to non-availability or prohibitive costs. Additionally, if the population elements are dispersed over a vast area, direct sampling might lead to excessive fieldwork costs. In such instances, cluster sampling becomes a viable alternative.
 
 Most large-scale surveys often involve a combination of multiple sampling design techniques, like cluster sampling and stratification, enable researchers to obtain accurate estimates while catering to practical and cost considerations. A central tenet to these designs is the concept of sampling weights, pivotal in ensuring unbiased estimation.
 
 Sampling weights are best defined as the inverse of the probability that a specific unit gets selected in the sample. These weights adjust for design-imposed inequalities in selection probabilities and compute point estimates.
-
 
 (Cluster sampling)
 
