@@ -5,6 +5,7 @@
 
 # Session Data files
 .RData
+Categorical_Assign1.html
 
 # RStudio files
 .Rproj.user/
@@ -23,5 +24,4 @@ Categorical_Assign1_files
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
-
 
