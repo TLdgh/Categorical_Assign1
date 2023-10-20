@@ -211,7 +211,9 @@ units(Bnhanes$sedmin) <- "mins"
 table1 (~ gender+age+marstat+samplewt+psu+strata+tchol+hdl+sysbp+dbp+wt+ht+vigwrk+modwrk+wlkbik+vigrecexr+modrecexr+sedmin+obese | BMI_level, data=Bnhanes)
 ```
 
-From the table 1, we can realized that there are 6445 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. But in original data set, it exists 6482 observations and 37 of them are missing information for variable bmi. We deleted these missing data and use BMI level to stratified observations, since the missind data less than 0.6% in total. This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally.
+From the table 1, we can realized that there are 6445 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. But in original data set, it exists 6482 observations and 37 of them are missing information for variable bmi. We deleted these missing data and use BMI level to stratified observations, since the missing data less than 0.6% in total. 
+
+This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally. It can be considered as there might exist some relationship with weight and age.
 ```{r}
 #exploratory average weight in every age grouped by gender
 gender<-nhanes%>%
@@ -229,8 +231,6 @@ gender<-nhanes%>%
    
    labs(title="Average Weight in Different Age",x="Age", y="Average weight (Kg)")+
    theme(plot.title = element_text(hjust = 0.5))
-      
-    
 ```
 
 For the observations in different marital status, we also interested in the relationship between weight and marital status.The following box plot shows that the average weight under different marital status are all around 80 Kg, widowed have lowest average weight among six categories.
@@ -245,19 +245,25 @@ ggplot(Nhanes, aes(x=marstat, y=wt, fill=marstat))+
         theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
               plot.title = element_text(hjust = 0.5)
        )
+```
 
-  
-#boxplot for vigorous activities VS weight
+Different types of work and recreational activities also are interesting variables to discuss.We can see that only 1 missing data in these four variables,so we omit this missing data directly. For the vigorous activities, observations not in both work and recreational activities got the lowest and highest BMI. No matter the condition on work activities, upper quartile for observations are below 30 and lower quartile greater than 20 in observations have vigorous recreational activities. This means that majority people in this condition have a healthy BMI index. For moderate activities, observation not in both moderate work and recreational activities have the highest BMI and observation only in moderate work activities have the lowest BMI. No matter the condition on work activities, upper quartile for observations are slightly above 30 and lower quartile greater than 20 in observations have vigorous recreational activities. In general, we can see from two plots that observations have vigorous or moderate recreational activities trend to have healthy BMI index than others,and under same recreational activities condition observations in moderate or vigorous work activities have less number of observations have high BMI index. Hence, different types of work or recreational activities may have relationship with weight and affect BMI index in this way.
+```{r} 
+#boxplot for Vigorous activities VS bmi
 Nhanes<-nhanes%>%
-  mutate(vigrecexr = case_when(
+   mutate(vigrecexr = case_when(
     (nhanes$vigrecexr %in% "Yes") ~ "Vigorous Recreational Activities",
     (nhanes$vigrecexr %in% "No") ~ "Not Vigorous Recreational Activities"))%>%
-  na.omit()
-  ggplot(Nhanes, aes(x=vigwrk, y=wt, fill=vigwrk))+
+   na.omit()
+   ggplot(Nhanes, aes(x=vigwrk, y=bmi, fill=vigwrk))+
         geom_boxplot() + 
-       facet_wrap(~vigrecexr) +
+        facet_wrap(~vigrecexr) +
+      geom_hline(yintercept = 18.5, linetype="dotted", size = 0.5)+
+      geom_hline(yintercept = 30, linetype="dotted", size = 0.5)+
+      annotate("text", y=18.5, x="Yes", label=" underweight")+
+      annotate("text", y=30,x="Yes", label=" obsity")+
         scale_fill_brewer(palette="Blues") +
-        labs(title = "Plot for weight in Vigorous Work and Recreational Activity", x=" Vigorous Work Activity", y="Weight (Kg)")+
+        labs(title = "Plot for BMI in Vigorous Activities", x=" Vigorous Work Activity", y="BMI")+
         theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
               plot.title = element_text(hjust = 0.5)
        )
@@ -268,32 +274,22 @@ Nhanes<-nhanes%>%
     (nhanes$modrecexr %in% "Yes") ~ "Moderate Recreational Activities",
     (nhanes$modrecexr %in% "No") ~ "Not Moderate Recreational Activities"))%>%
   na.omit()
-  ggplot(Nhanes, aes(x=modwrk, y=wt, fill=modwrk))+
+  ggplot(Nhanes, aes(x=modwrk, y=bmi, fill=modwrk))+
         geom_boxplot() + 
        facet_wrap(~modrecexr) +
         scale_fill_brewer(palette="Blues") +
-        labs(title = "Plot for weight in Moderate Work and Recreational Activity", x=" Moderate Work Activity", y="Weight (Kg)")+
+    geom_hline(yintercept = 18.5, linetype="dotted", size = 0.5)+
+      geom_hline(yintercept = 30, linetype="dotted", size = 0.5)+
+      annotate("text", y=18.5, x="Yes", label=" underweight")+
+      annotate("text", y=30,x="Yes", label=" obsity")+
+        labs(title = "Plot for BMI in Moderate Activities", x=" Moderate Work Activity", y="BMI")+
         theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
               plot.title = element_text(hjust = 0.5)
        )
 ```
 
-In order to have improve understanding with the relationship between weight and other health related variables, we can categorize the weight level for every observation by BMI.
-```{r}
-# categorize the BMI level (CDC standard) and age group (NIH standard)
-Catenhanes<-nhanes%>%
-  mutate(BMI_level = case_when(
-    nhanes$bmi < 18.5 ~"Underweight",
-    nhanes$bmi < 25 ~"Healthy weight",
-    nhanes$bmi < 30 ~"Overweight",
-    nhanes$bmi >= 35 ~"Obesity "),
-   group=case_when(
-     nhanes$age < 18 ~ "Adolescents",
-     nhanes$age < 65 ~ "Adults",
-     nhanes$age >=65 ~ "Older Adults"
-   ))
 
-```
+
 
 
 
