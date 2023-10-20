@@ -4,9 +4,7 @@ author:
 - Teng Li(7373086)
 - Zhize Lu(300075114)
 - Chutong Zhang(300311325)
-output:
-  pdf_document: default
-  html_document: default
+output: html_document
 header-includes:
 - \renewcommand{\and}{\\}
 - \usepackage{float}
@@ -15,7 +13,7 @@ bibliography: References.bib
 link-citations: yes
 ---
 
-```{=html}
+
 <style type="text/css">
 body{
 font-size: 12pt;
@@ -24,7 +22,7 @@ table{
 font-size: 12pt;
 }
 </style>
-```
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 library(plotly)
