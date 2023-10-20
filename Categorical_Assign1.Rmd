@@ -210,11 +210,11 @@ Most large-scale surveys often involve a combination of multiple sampling design
 
 Sampling weights are best defined as the inverse of the probability that a specific unit gets selected in the sample. These weights adjust for design-imposed inequalities in selection probabilities and are used tp compute point estimates.
 
-In the case of the stratified random sampling. The population U of size N is partitioned into stratums denoted by $U_1,...,U_h,...,U_H$. The size of $h$th stratum is denoted by $N_h$.In stratum $h$, a random sample $S_h$ of size $n_h$ is selected based on a sampling design, here we use simple random sampling for simplicity and efficiency. In this stratified random sampling, the estimate of population total can be show as following(@Lohr_2022):
+In the case of the stratified random sampling. The population U of size N is partitioned into stratums denoted by $U_1,...,U_h,...,U_H$. The size of $h$th stratum is denoted by $N_h$.In stratum $h$, a random sample $S_h$ of size $n_h$ is selected based on a sampling design, here we use simple random sampling for simplicity and efficiency. In this stratified random sampling, the estimate of population total can be show as following[@Lohr_2022]:
 
 $\hat{t}_{str}=\sum_{h=1}^H\sum_{j\in S_h}w_{hj}y_{hj}$
 
-where the $w_{hj}=N_h/n_h$ represents the sampling weight of the $j$th observation in the $h$th stratum, $y_{hj}$. Note that the probability of sample selection of the $j$th unit in the $h$th stratum is $\pi_{hj}=n_h/N_h$.In this case, the sampling weight is the inverse of such probability $\pi_{hj}$. The unbiased estimator of the population mean $\bar{y}_U$ can also be shown with sampling weight as following(@Lohr_2022):
+where the $w_{hj}=N_h/n_h$ represents the sampling weight of the $j$th observation in the $h$th stratum, $y_{hj}$. Note that the probability of sample selection of the $j$th unit in the $h$th stratum is $\pi_{hj}=n_h/N_h$.In this case, the sampling weight is the inverse of such probability $\pi_{hj}$. The unbiased estimator of the population mean $\bar{y}_U$ can also be shown with sampling weight as following[@Lohr_2022]:
 
 $\hat{\bar{y}}_{str}=\frac{\sum_{h=1}^H\sum_{j\in S_h}w_{hj}y_{hj}}{\sum_{h=1}^H\sum_{j\in S_h}w_{hj}}$
 
@@ -222,7 +222,7 @@ Cluster sampling is another complex sampling technique for large-scale surveys w
 
 In the case of two-stage cluster sampling with equal probabilities, the sampling weight can be expressed as the following: $w_{ij}=1/\pi_{ij}=\frac{NM_i}{nm_i}$, where $\pi_{ij}$ is the probability that the $j$th ssu in the $i$th psu is in the sample. For unequal probabilities, we need the probability that the $i$th psu is in the sample,$\pi_i$, and the probability that the $j$th ssu is in the sample given that the $i$th psu is in the sample, $\pi_{j|i}$. Then, the sampling weight is given by $w_{ij}=1/(\pi_i\pi_{j|i})$.
 
-With the sampling weight shown above, the estimator of the population total in cluster sampling can also be show in the following forms(@Lohr_2022):
+With the sampling weight shown above, the estimator of the population total in cluster sampling can also be show in the following forms[@Lohr_2022]:
 
 $\hat{t}=\sum_{i\in S}\sum_{j\in S_i}w_{ij}y_{ij}$
 
