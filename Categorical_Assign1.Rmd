@@ -1,17 +1,18 @@
 ---
 title: "MAT5317 Categorical Assignment 1"
-author: 
-  - Teng Li(7373086)
-  - Zhize Lu(300075114) 
-  - Chutong Zhang(300311325)
+author:
+- Teng Li(7373086)
+- Zhize Lu(300075114)
+- Chutong Zhang(300311325)
 output: html_document
-header-includes: 
-  - \renewcommand{\and}{\\}
-  - \usepackage{float}
-  - \floatplacement{figure}{H}
+header-includes:
+- \renewcommand{\and}{\\}
+- \usepackage{float}
+- \floatplacement{figure}{H}
 bibliography: References.bib
 link-citations: yes
 ---
+
 
 <style type="text/css">
 body{
@@ -32,19 +33,22 @@ library(ggplot2)
 ```
 
 ## Introduction
-We were given the data set of The National Health and Nutrition Examination Survey (NHANES). The survey program has been conducted as a series of surveys designed to assess the health and nutritional status of adults and children in the United States since the 1960s, according to CDC [@CDC]. It combines in-person face-to-face interviews and physical examinations of participants for data collection. 
 
-The survey data wasn't a simple random sample, however. According to CDC's National Health and Nutrition Examination Survey: Plan and Operations, 1999–2010 [@SurveyDesign], the sampling strategy consists of several stages: 1. Selection of counties as primary sampling units (PSU). 2. selection of segments within PSUs that constitute blocks of households. 3. Selection of specific households within segments. 4. Selection of individuals within a household. 
+We were given the data set of The National Health and Nutrition Examination Survey (NHANES). The survey program has been conducted as a series of surveys designed to assess the health and nutritional status of adults and children in the United States since the 1960s, according to CDC [@CDC]. It combines in-person face-to-face interviews and physical examinations of participants for data collection.
+
+The survey data wasn't a simple random sample, however. According to CDC's National Health and Nutrition Examination Survey: Plan and Operations, 1999--2010 [@SurveyDesign], the sampling strategy consists of several stages: 1. Selection of counties as primary sampling units (PSU). 2. selection of segments within PSUs that constitute blocks of households. 3. Selection of specific households within segments. 4. Selection of individuals within a household.
 
 We aim to study the relationship between the weight variable and the other health related variables of the data.
 
 ## Method
+
 We began our study by doing an exploratory analysis among the variables through various tables and charts. We then performed several hypothesis tests on some of the variables. Lastly we did a linear regression model fit to the response variable "weight" with other variables and confounders.
 
 ## Part 1: Exploratory Analysis
-We began our analysis by giving a data dictionary of the data shown in Table 1 below. As one can see that some variables have a high percentage of missing values. In Part 2 we made hypothesis tests to decide if some of these variables could be excluded from the regression analysis in Part 3. 
 
-The weight variable was a continuous random variable in our data. A simple way of categorizing it was to consider the BMI indicator. As one could see there was an obese variable in the data. The weight variable was categorized by giving a threshold of 35 to the BMI value. A person is considered healthy if the BMI is below 35, and obese otherwise. Therefore, we used the obese variable as the categorical random variable in our project. 
+We began our analysis by giving a data dictionary of the data shown in Table 1 below. As one can see that some variables have a high percentage of missing values. In Part 2 we made hypothesis tests to decide if some of these variables could be excluded from the regression analysis in Part 3.
+
+The weight variable was a continuous random variable in our data. A simple way of categorizing it was to consider the BMI indicator. As one could see there was an obese variable in the data. The weight variable was categorized by giving a threshold of 35 to the BMI value. A person is considered healthy if the BMI is below 35, and obese otherwise. Therefore, we used the obese variable as the categorical random variable in our project.
 
 From the table 1, we can realized that there are 6445 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. But in original data set, it exists 6482 observations and 37 of them are missing information for variable bmi. We deleted these missing data and use BMI level to stratified observations, since the missing data less than 0.6% in total. 
 ```{r}
@@ -131,7 +135,7 @@ DataDict%>%remove_rownames()%>%kable(caption = "Data Variable Definition")%>%
   row_spec(0,bold=TRUE)
 ```
 
-According to CDC's classification on bodyweight, we have: BMI<18.5 as Underweight, BMI between 18.5 and 24.9 as Health, BMI between 25 and 29.9 as Overweight, and BMI>30 as obesity. We adopted this category and found that there was a slight positive relationship between bodyweight and the total cholesterol level. However, we noticed that there was a negative relationship between the HDL and bodyweight. Because of the fact that Tchol is the sum of HDL and LDL, we can conclude that the obese population has a high level of LDL and a low level HDL.
+According to CDC's classification on bodyweight, we have: BMI\<18.5 as Underweight, BMI between 18.5 and 24.9 as Health, BMI between 25 and 29.9 as Overweight, and BMI\>30 as obesity. We adopted this category and found that there was a slight positive relationship between bodyweight and the total cholesterol level. However, we noticed that there was a negative relationship between the HDL and bodyweight. Because of the fact that Tchol is the sum of HDL and LDL, we can conclude that the obese population has a high level of LDL and a low level HDL.
 
 ```{r}
 nhanes%>%mutate(CDC_obese=case_when(
@@ -255,6 +259,7 @@ IndepTest<-setRefClass(
 ```
 
 We first test the independence between obesity and marital status. We form the following contingency table:
+
 ```{r}
 test_marstat<-IndepTest$new(nhanes, "marstat", "obese")
 test_marstat$res$marstat%>%
@@ -270,11 +275,12 @@ pv<-test_marstat$get_pvalue()%>%as.numeric()
 
 Let X be the categorical random variable for Marital Status and Y be the one for Obesity. Assuming a random sample of n trials. Define the count random variable $N_{ij}:=\sum_{k=1}^n \mathbf{I}_k(X=i, Y=j)$ where $\mathbf{I}_k$ is the indicator function for the k-th trial, then the joint random variables $[N_{11}, ..., N_{IJ}]$ has a Multinomial distribution $\vec{p}=[p_{11}, ..., p_{IJ}]$. Our hypothesis test is therefore:
 
+```{=tex}
 \begin{gather*}
 H_0: p_{ij}= p_{i+} \cdot p_{+j} ~ \forall i,j\\
 H_1:p_{ij} \neq p_{i+} \cdot p_{+j} ~ \forall i,j
 \end{gather*}
-
+```
 We use the chi-squared test to conclude that there is not enough evidence to reject the null hypothesis with a p-value equal to `r pv`. In other words, we cannot conclude that there is a relationship between obesity and marital status.
 
 We do the same test for other variables compared with obesity. From Table 2 we can see that we can reject the independence between obesity and wlkbik, vigrecexr and modrecexr variables.
@@ -286,6 +292,70 @@ tests$get_pvalue()%>%
   kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")
 ```
 
+Based on thresholds established by clinicians, we categorizing four variables related to the cholesterol and blood pressure level.
+
+Cholesterol is an essential fat in the body. According to American Heart Association, We have: tchol of 240mg/dl or higher OR hdl under 40mg/dL as Dangerous Cholesterol level; tchol between 200-239mg/dL OR hdl between 40-59mg/dL for males OR between 50-59mg/dL for females as at risk level; tchol under 200mg/dL and hdl of 60mg/dL and higher as healthy level.
+
+Blood pressure is typically categorized into different stages based on the systolic (top number) and diastolic (bottom number) readings. According to American Heart Association, We have: systolic level less than 120mm Hg and diastolic level less than 80mm Hg as normal blood pressure; systolic level between 120-129mm Hg and diastolic level less than 80mm Hg as elevated blood pressure; systolic level between 130-139mm Hg OR diastolic level between 80-89mm Hg as Hypertension Stage 1; systolic level 140mm Hg or higher OR diastolic level 90mm Hg or higher as Hypertension Stage 2; systolic level higher than 180mm Hg OR diastolic level higher than 120mm Hg as Hypertensive Crisis.
+
+```{r}
+
+nhanes_data <- nhanes
+
+# Categorizing cholesterol levels
+nhanes_data$chol_category <- with(nhanes_data, ifelse(
+  tchol >= 240 | hdl < 40, "Dangerous",
+  ifelse(
+    tchol >= 200 & tchol < 240 | 
+    (gender == "Male" & hdl >= 40 & hdl < 60) |  # Male and HDL between 40-59
+    (gender == "Female" & hdl >= 50 & hdl < 60),   # Female and HDL between 50-59
+    "At Risk",
+    "Healthy"
+  )
+))
+
+# Preview the updated variable
+head(nhanes_data[, c("gender","tchol", "hdl", "chol_category")])
+
+# Categorizing blood pressure
+nhanes_data$bp_category <- with(nhanes_data, ifelse(
+  sysbp < 120 & dbp < 80, "Normal",
+  ifelse(sysbp >= 120 & sysbp <= 129 & dbp < 80, "Elevated",
+  ifelse((sysbp >= 130 & sysbp <= 139) | (dbp >= 80 & dbp <= 89), "Hypertension Stage 1",
+  ifelse(sysbp >= 140 | dbp >= 90, "Hypertension Stage 2",
+  ifelse(sysbp > 180 | dbp > 120, "Hypertensive Crisis", NA))))))
+
+# Preview the new variable
+head(nhanes_data[, c("sysbp", "dbp", "bp_category")])
+```
+
+## Exrtra topic: Survey weights in complex survey designs
+
+Most large-scale surveys often involve a combination of multiple sampling design techniques, like stratification and cluster sampling, enable researchers to obtain accurate estimates while catering to practical and cost considerations. A central tenet to these designs is the concept of sampling weights, pivotal in ensuring unbiased estimation.
+
+Sampling weights are best defined as the inverse of the probability that a specific unit gets selected in the sample. These weights adjust for design-imposed inequalities in selection probabilities and are used tp compute point estimates.
+
+In the case of the stratified random sampling. The population U of size N is partitioned into stratums denoted by $U_1,...,U_h,...,U_H$. The size of $h$th stratum is denoted by $N_h$.In stratum $h$, a random sample $S_h$ of size $n_h$ is selected based on a sampling design, here we use simple random sampling for simplicity and efficiency. In this stratified random sampling, the estimate of population total can be show as following[@Lohr_2022]:
+
+$\hat{t}_{str}=\sum_{h=1}^H\sum_{j\in S_h}w_{hj}y_{hj}$
+
+where the $w_{hj}=N_h/n_h$ represents the sampling weight of the $j$th observation in the $h$th stratum, $y_{hj}$. Note that the probability of sample selection of the $j$th unit in the $h$th stratum is $\pi_{hj}=n_h/N_h$.In this case, the sampling weight is the inverse of such probability $\pi_{hj}$. The unbiased estimator of the population mean $\bar{y}_U$ can also be shown with sampling weight as following[@Lohr_2022]:
+
+$\hat{\bar{y}}_{str}=\frac{\sum_{h=1}^H\sum_{j\in S_h}w_{hj}y_{hj}}{\sum_{h=1}^H\sum_{j\in S_h}w_{hj}}$
+
+Cluster sampling is another complex sampling technique for large-scale surveys when the population elements are dispersed and the the fieldwork is costly. We sample the primary sampling units(psu's) which are often from the natural groupings of the population elements. In cluster sampling, we have $N$ as the number of psu's in the population. $i$th psu contains $M_i$ elements. For sample of psu's, $S$, We denote $n$ as the number of psu's in the sample. For a two-stage cluster sampling, a $S_i$ sub-sample of secondary sampling units(ssu's) is chosen from $i$th psu, $i=1,...,n$. The sub-sample size is $m_i$.
+
+In the case of two-stage cluster sampling with equal probabilities, the sampling weight can be expressed as the following: $w_{ij}=1/\pi_{ij}=\frac{NM_i}{nm_i}$, where $\pi_{ij}$ is the probability that the $j$th ssu in the $i$th psu is in the sample. For unequal probabilities, we need the probability that the $i$th psu is in the sample,$\pi_i$, and the probability that the $j$th ssu is in the sample given that the $i$th psu is in the sample, $\pi_{j|i}$. Then, the sampling weight is given by $w_{ij}=1/(\pi_i\pi_{j|i})$.
+
+With the sampling weight shown above, the estimator of the population total in cluster sampling can also be show in the following forms[@Lohr_2022]:
+
+$\hat{t}=\sum_{i\in S}\sum_{j\in S_i}w_{ij}y_{ij}$
+
+and the estimator of the population mean:
+
+$\hat{\bar{y}}=\frac{\sum_{i\in S}\sum_{j\in S_i}w_{ij}y_{ij}}{\sum_{i\in S}\sum_{j\in S_i}w_{ij}}$
+
+In essence, sampling weights in complex survey designs play a crucial role in ensuring that the survey results are both accurate and generalizable to the broader population.
 
 
 
