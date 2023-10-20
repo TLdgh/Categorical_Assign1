@@ -2,11 +2,15 @@
 .Rhistory
 .Rapp.history
 .DS_Store
+
 # Session Data files
 .RData
+Categorical_Assign1.html
+
 # RStudio files
 .Rproj.user/
 Categorical_Assign1.Rproj
+
 # produced vignettes
 *.log
 *.tex
@@ -16,6 +20,7 @@ Categorical_Assign1_files
 # knitr and R markdown default cache directories
 *_cache/
 /cache/
+
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md

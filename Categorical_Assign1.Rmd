@@ -23,13 +23,13 @@ font-size: 12pt;
 }
 </style>
 
-```{r setup, include=FALSE}
+```{r setup, echo=FALSE, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 library(plotly)
 library(tidyverse)
 library(kableExtra)
 library(aplore3)
-library(ggplot2)
+library(table1)
 ```
 
 ## Introduction
@@ -53,8 +53,6 @@ The weight variable was a continuous random variable in our data. A simple way o
 From the table 1, we can realized that there are 6445 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. But in original data set, it exists 6482 observations and 37 of them are missing information for variable bmi. We deleted these missing data and use BMI level to stratified observations, since the missing data less than 0.6% in total. 
 ```{r}
 #Table 1 
-#install.packages("table1")
-library(table1)
 Bnhanes<-nhanes
 Bnhanes<-mutate(Bnhanes,BMI_level = case_when(
     Bnhanes$bmi < 18.5 ~"Underweight",
@@ -158,7 +156,7 @@ This data set mainly focus on the observers between 16 to 80 years old. Among th
 #exploratory average weight in every age grouped by gender
 gender<-nhanes%>%
   group_by(gender,age)%>%
-  summarise(Avgwt=mean(wt,na.rm=TRUE))
+  summarise(Avgwt=mean(wt,na.rm=TRUE), .groups="drop")
    ggplot(gender,aes(x=age, y=Avgwt), group=gender)+
      geom_point(aes(colour=gender),size=1 )+
      geom_line(aes(fill=gender,colour=gender,linetype=gender) )+
