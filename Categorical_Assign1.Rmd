@@ -337,8 +337,16 @@ Cholesterol is an essential fat in the body. According to American Heart Associa
 Blood pressure is typically categorized into different stages based on the systolic (top number) and diastolic (bottom number) readings. According to American Heart Association, We have: systolic level less than 120mm Hg and diastolic level less than 80mm Hg as normal blood pressure; systolic level between 120-129mm Hg and diastolic level less than 80mm Hg as elevated blood pressure; systolic level between 130-139mm Hg OR diastolic level between 80-89mm Hg as Hypertension Stage 1; systolic level 140mm Hg or higher OR diastolic level 90mm Hg or higher as Hypertension Stage 2; systolic level higher than 180mm Hg OR diastolic level higher than 120mm Hg as Hypertensive Crisis.
 
 ```{r}
-
+#Categorization
 nhanes_data <- nhanes
+
+nhanes_data <- nhanes_data[complete.cases(nhanes_data[, c("bmi", "gender", "tchol", "hdl", "sysbp", "dbp")]), ]
+
+# Categorize body weight based on BMI
+nhanes_data$weight_category <- with(nhanes_data, ifelse(
+  bmi < 18.5, "Underweight",
+  ifelse(bmi >= 18.5 & bmi <= 24.9, "Healthy",
+  ifelse(bmi >= 25 & bmi <= 29.9, "Overweight", "Obese"))))
 
 # Categorizing cholesterol levels
 nhanes_data$chol_category <- with(nhanes_data, ifelse(
@@ -352,19 +360,74 @@ nhanes_data$chol_category <- with(nhanes_data, ifelse(
   )
 ))
 
-# Preview the updated variable
-head(nhanes_data[, c("gender","tchol", "hdl", "chol_category")])
+# Preview
+#head(nhanes_data[, c("gender","tchol", "hdl", "chol_category")])
 
 # Categorizing blood pressure
 nhanes_data$bp_category <- with(nhanes_data, ifelse(
   sysbp < 120 & dbp < 80, "Normal",
   ifelse(sysbp >= 120 & sysbp <= 129 & dbp < 80, "Elevated",
-         ifelse((sysbp >= 130 & sysbp <= 139) | (dbp >= 80 & dbp <= 89), "Hypertension Stage 1",
-                ifelse(sysbp >= 140 | dbp >= 90, "Hypertension Stage 2",
-                       ifelse(sysbp > 180 | dbp > 120, "Hypertensive Crisis", NA))))))
+  ifelse(sysbp > 180 | dbp > 120, "Hypertensive Crisis",
+  ifelse((sysbp >= 130 & sysbp <= 139) | (dbp >= 80 & dbp <= 89), "Hypertension Stage 1",
+  ifelse(sysbp >= 140 | dbp >= 90, "Hypertension Stage 2", NA))))))
 
-# Preview the new variable
-head(nhanes_data[, c("sysbp", "dbp", "bp_category")])
+# Preview
+#head(nhanes_data[, c("sysbp", "dbp", "bp_category")])
+```
+
+Contingency tables and Hypothesis tests
+
+```{r}
+test1 <- IndepTest$new(nhanes_data, "weight_category", "chol_category")
+test2 <- IndepTest$new(nhanes_data, "weight_category", "bp_category")
+test3 <- IndepTest$new(nhanes_data, "chol_category", "bp_category")
+
+#contingency table for Weight vs. Cholesterol
+table_weight_chol <- test1$res$weight_category %>%
+  rename("\t" = weight_category) %>%
+  add_column(" " = c("Weight", rep(" ", nrow(.) - 1)), .before = "\t") %>%
+  kable(caption = "Contingency Table: Weight vs. Cholesterol") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left") %>%
+  add_header_above(c(" " = 1, " " = 1, "Cholesterol" = 3)) %>%
+  column_spec(1:2, width = "10em", bold = TRUE)
+
+#contingency table for Weight vs. Blood Pressure
+table_weight_bp <- test2$res$weight_category %>%
+  rename("\t" = weight_category) %>%
+  add_column(" " = c("Weight", rep(" ", nrow(.) - 1)), .before = "\t") %>%
+  kable(caption = "Contingency Table: Weight vs. Blood Pressure") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left") %>%
+  add_header_above(c(" " = 1, " " = 1, "Blood Pressure" = 5)) %>%
+  column_spec(1:2, width = "10em", bold = TRUE)
+
+#contingency table for Cholesterol vs. Blood Pressure
+table_chol_bp <- test3$res$chol_category %>%
+  rename("\t" = chol_category) %>%
+  add_column(" " = c("Cholesterol", rep(" ", nrow(.) - 1)), .before = "\t") %>%
+  kable(caption = "Contingency Table: Cholesterol vs. Blood Pressure") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left") %>%
+  add_header_above(c(" " = 1, " " = 1, "Blood Pressure" = 5)) %>%
+  column_spec(1:2, width = "10em", bold = TRUE)
+
+table_weight_chol
+table_weight_bp
+table_chol_bp
+
+pvals1 <- test1$get_pvalue() %>%
+  kable(caption = "p-values of Independence Tests between Weight and Cholesterol") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
+
+pvals2 <- test2$get_pvalue() %>%
+  kable(caption = "p-values of Independence Tests between Weight and Blood Pressure") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
+
+pvals3 <- test3$get_pvalue() %>%
+  kable(caption = "p-values of Independence Tests between Cholesterol and Blood Pressure") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
+
+pvals1
+pvals2
+pvals3
 ```
 
 ## Exrtra topic: Survey weights in complex survey designs
