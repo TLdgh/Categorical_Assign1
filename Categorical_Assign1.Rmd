@@ -50,7 +50,13 @@ We began our analysis by giving a data dictionary of the data shown in Table 1 b
 
 The weight variable was a continuous random variable in our data. A simple way of categorizing it was to consider the BMI indicator. As one could see there was an obese variable in the data. The weight variable was categorized by giving a threshold of 35 to the BMI value. A person is considered healthy if the BMI is below 35, and obese otherwise. Therefore, we used the obese variable as the categorical random variable in our project.
 
-From the table 1, we can realized that there are 6445 observations with 21 variables in our data set and 8 variables can be considered as categorical variables. But in original data set, it exists 6482 observations and 37 of them are missing information for variable bmi. We deleted these missing data and use BMI level to stratified observations, since the missing data less than 0.6% in total. 
+The  NHANES III data set from 2009-2010 is an ongoing and continuous survey focused on civilian noninstitutional population fo the United states and published by CDC every year, it is designed to be a surveillance of specific diseases and behaviors,providing statistical insights into the U.S population.[@SurveyDesign] In this assignment, we accessed the data set from the aplore3 package in R, which contains 6482 observations in 21 variables.Of these, 8(gender, marstat, vigwrk, modwrk, wlkbik, vigrecexr, and obesity)can be considered as categorical variables, while the rest as numerical variables.
+
+In categorical variables, we need to specified the vigorous work or recreational activities and moderate work or recreational activities. vigorous work or recreational activities means that intense physical exertion leading to significant elevation in respiration and heart rate, it usually sustained for more than 10 minutes during the work or recreational activities. Moderate work and recreational activities means that activities require moderate physical effort and results in slight increase in respiration and heart rate, it usually sustained for less than 10 minutes during the work or recreational activities.[@CODE] 
+
+In numerical variables, we also want to elucidate several variables related to cholesterol and blood pressure. Cholesterol is a type of lipid that helps body perform important body functions. Tchol indicates the Total Cholesterol, it is the total number of cholesterol circulation in people's blood. Hdl indicates the HDL-Cholesterol, it is the high-density lipoprotein cholesterol that helps people transfer excess cholestrol from the blood to the liver.[@CHOL] Sysbp stands for Systolic Blood Pressure and dbp stands for Diastolic Blood Pressure, systolic pressure repersents the maximum blood pressure when ventricles contract, while diastolic pressure denotes the minimum blood pressure registered just before the subsequent contraction.[@BP] We will discuss the thresholds for cholesterol and blood pressure in the following discussion. Two other variables in this dataset are worth noticing, psu and strata, it is the Pseudo-PSU and Pseudo-stratum used in sampling strategy. In this data set, stratum was defined by geography and psu were selected from every stratum with probability proportional to a measure of size(PPS). More details about survey weights for NHANES will be presented in the extra topic part.
+
+In original data set, it exists 6482 observations and 37 of them are missing information for variable bmi. We deleted these missing data,only perform 6445 observations as total sample size and use BMI level to stratified observations, since the missing data less than 0.6% in total. As can be seen in table 1, the first three columns are different level of BMI based on CDC's classification,the last column is the overall performance for every variables. For categorical variables, first three column presented the total number of observation and percentage under the stratification condition, last column is the sum of the first three column and the percentage of the total observations. For numerical variables, first three columns are the mean and standard deviation under the stratification condition and the last column is the mean and standard deviation under overall level.
 ```{r}
 #Table 1 
 Bnhanes<-nhanes
@@ -92,45 +98,14 @@ units(Bnhanes$ht) <- "cm"
 units(Bnhanes$bmi) <- "Kg/m^2"
 units(Bnhanes$sedmin) <- "mins"
 
-tbl<-table1 (~ gender+age+marstat+samplewt+psu+strata+tchol+hdl+sysbp+dbp+wt+ht+vigwrk+modwrk+wlkbik+vigrecexr+modrecexr+sedmin+obese |BMI_level, data=Bnhanes)
+my.render.cont <- function(x) {
+    with(stats.apply.rounding(stats.default(x), digits=3), c("",
+        "Mean (SD)"=sprintf("%s (± %s)", MEAN, SD)))
+}
+
+tbl<-table1 (~ gender+age+marstat+samplewt+psu+strata+tchol+hdl+sysbp+dbp+wt+ht+vigwrk+modwrk+wlkbik+vigrecexr+modrecexr+sedmin+obese |BMI_level,render.continuous=my.render.cont, data=Bnhanes)
 kable(tbl,"html",caption="Table 1: Characteristics of the data set NHANES")%>%
  kable_styling(bootstrap_options = "striped", full_width = F)
-```
-
-```{r}
-#create data variable definition
-DataDict<-data.frame(
-  Variables=colnames(nhanes), 
-  Type=sapply(nhanes, function(x) class(x)),
-  Example=sapply(nhanes, function(x) paste(as.character(head(unique(x),3)), collapse = ", ")),
-  Number.Unique=sapply(nhanes, function(x) length(unique(na.omit(x)))),
-  MissingPct=sapply(nhanes, function(x) paste0(round(sum(is.na(x))/nrow(nhanes)*100,2), "%")),
-  Comment=c("Identification Code (1 - 6482)",
-            "Gender (1: Male, 2: Female)",
-            "Age (Years)",
-            "Marital Status (1: Married, 2: Widowed, 3: Divorced, 4: Separated, 5: Never Married, 6: Living Together)",
-            "Statistical Weight (4084.478 - 153810.3)",
-            "Pseudo-PSU (1, 2)",
-            "Pseudo-Stratum (1 - 15)",
-            "Total Cholesterol (mg/dL)",
-            "HDL-Cholesterol (mg/dL)",
-            "Systolic Blood Pressure (mm Hg)",
-            "Diastolic Blood Pressure (mm Hg)",
-            "Weight (kg)", 
-            "Standing Height (cm)",  
-            "Body mass Index (Kg/m^2)",
-            "Vigorous Work Activity (1: Yes, 2: No)",
-            "Moderate Work Activity (1: Yes, 2: No)",
-            "Walk or Bicycle (1: Yes, 2: No)",
-            "Vigorous Recreational Activities (1: Yes, 2: No)",
-            "Moderate Recreational Activities (1: Yes, 2: No)",
-            "Minutes of Sedentary Activity per Week (0 - 840)",
-            "BMI>35 (1: No, 2: Yes)")
-)
-
-DataDict%>%remove_rownames()%>%kable(caption = "Data Variable Definition")%>%
-  kable_styling(bootstrap_options=c("striped","bordered","condensed"),position="float_left")%>%
-  row_spec(0,bold=TRUE)
 ```
 
 According to CDC's classification on bodyweight, we have: BMI\<18.5 as Underweight, BMI between 18.5 and 24.9 as Health, BMI between 25 and 29.9 as Overweight, and BMI\>30 as obesity. We adopted this category and found that there was a slight positive relationship between bodyweight and the total cholesterol level. However, we noticed that there was a negative relationship between the HDL and bodyweight. Because of the fact that Tchol is the sum of HDL and LDL, we can conclude that the obese population has a high level of LDL and a low level HDL.
