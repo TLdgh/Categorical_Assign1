@@ -350,7 +350,7 @@ nhanes_data$bp_category <- with(nhanes_data, ifelse(
 #head(nhanes_data[, c("sysbp", "dbp", "bp_category")])
 ```
 
-Contingency tables and Hypothesis tests
+After categorizing Cholesterol level and blood pressure, we create three contingency tables:
 
 ```{r}
 test1 <- IndepTest$new(nhanes_data, "weight_category", "chol_category")
@@ -404,6 +404,11 @@ pvals1
 pvals2
 pvals3
 ```
+We also conducted hypothesis testing using Pearson chi-squared test. The p-value for weight and cholesterol is extremely small, equals to $1.475\times10^{-53}$. This suggest that there is a statistically significant association between weight and cholesterol levels. For weight against blood pressure, the p-value is $5.723\times10^{-35}$ which indicates that between weight and blood pressure, there is significant relationship. Cholesterol level is also associated with blood pressure with a p-value equals to $3.286\times10^{-13}$.
+
+However, there are potential confounding variables like age, diet, etc. Some of the variables are not recorded in the data. For further study, we need to conduct stratified analysis. 
+
+The results suggest that there is a significant association between weight, cholesterol, and blood pressure. The patterns observed in the contingency tables align with general health knowledge: obesity is a risk factor for both high cholesterol and high blood pressure. 
 
 ## Exrtra topic: Survey weights in complex survey designs
 
