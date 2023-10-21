@@ -201,7 +201,6 @@ Nhanes<-nhanes%>%
        )
 ```
 
-## Part 2: Hypothesis Tests
 
 ```{r}
 IndepTest<-setRefClass(
