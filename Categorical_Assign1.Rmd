@@ -383,7 +383,7 @@ test2 <- IndepTest$new(nhanes_data, "weight_category", "bp_category")
 test3 <- IndepTest$new(nhanes_data, "chol_category", "bp_category")
 
 #contingency table for Weight vs. Cholesterol
-table_weight_chol <- test1$res$weight_category %>%
+table_weight_chol <- test1$ContingencyTbl$weight_category %>%
   rename("\t" = weight_category) %>%
   add_column(" " = c("Weight", rep(" ", nrow(.) - 1)), .before = "\t") %>%
   kable(caption = "Contingency Table: Weight vs. Cholesterol") %>%
@@ -392,7 +392,7 @@ table_weight_chol <- test1$res$weight_category %>%
   column_spec(1:2, width = "10em", bold = TRUE)
 
 #contingency table for Weight vs. Blood Pressure
-table_weight_bp <- test2$res$weight_category %>%
+table_weight_bp <- test2$ContingencyTbl$weight_category %>%
   rename("\t" = weight_category) %>%
   add_column(" " = c("Weight", rep(" ", nrow(.) - 1)), .before = "\t") %>%
   kable(caption = "Contingency Table: Weight vs. Blood Pressure") %>%
@@ -401,7 +401,7 @@ table_weight_bp <- test2$res$weight_category %>%
   column_spec(1:2, width = "10em", bold = TRUE)
 
 #contingency table for Cholesterol vs. Blood Pressure
-table_chol_bp <- test3$res$chol_category %>%
+table_chol_bp <- test3$ContingencyTbl$chol_category %>%
   rename("\t" = chol_category) %>%
   add_column(" " = c("Cholesterol", rep(" ", nrow(.) - 1)), .before = "\t") %>%
   kable(caption = "Contingency Table: Cholesterol vs. Blood Pressure") %>%
@@ -413,15 +413,15 @@ table_weight_chol
 table_weight_bp
 table_chol_bp
 
-pvals1 <- test1$get_pvalue() %>%
+pvals1 <- test1$pval_df %>%
   kable(caption = "p-values of Independence Tests between Weight and Cholesterol") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
 
-pvals2 <- test2$get_pvalue() %>%
+pvals2 <- test2$pval_df %>%
   kable(caption = "p-values of Independence Tests between Weight and Blood Pressure") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
 
-pvals3 <- test3$get_pvalue() %>%
+pvals3 <- test3$pval_df %>%
   kable(caption = "p-values of Independence Tests between Cholesterol and Blood Pressure") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
 
