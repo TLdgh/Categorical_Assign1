@@ -14,7 +14,7 @@ IndepTest<-setRefClass(
       .self$ContingencyTbl<-.self$create_list(data, variable_x, reference_y)
       
       #calculate the pvalues and make a data frame
-      .self$pval_df<- .self$chi_square_test(my_list=ContingencyTbl)
+      .self$pval_df<- .self$get_pvalue(my_list=ContingencyTbl)
     },
     
     create_list=function(data, variable_x, reference_y){
@@ -25,7 +25,7 @@ IndepTest<-setRefClass(
       return(my_list)
     }, 
     
-    chi_square_test=function(my_list){
+    get_pvalue=function(my_list){
       #do the chi-squared test
       pvalues<-map(my_list, function(x){
         if(any(is.na(x))==FALSE){

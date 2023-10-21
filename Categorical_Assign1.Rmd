@@ -300,7 +300,7 @@ We first test the independence between obesity and marital status. We form the f
 
 ```{r}
 test_marstat<-IndepTest$new(nhanes, "marstat", "obese")
-test_marstat$res$marstat%>%
+test_marstat$ContingencyTbl$marstat%>%
   rename("\t" = marstat) %>%
   add_column(" " = c("Marital Status", rep(" ", nrow(.) - 1)), .before = "\t") %>%
   kable(caption = "Contingency Table")%>%
@@ -308,7 +308,7 @@ test_marstat$res$marstat%>%
   add_header_above(c(" " = 1, " " = 1, "Obesity" = 2))%>%
   column_spec(1:2,width = "10em",bold=TRUE)
 
-pv<-test_marstat$get_pvalue()%>%as.numeric()
+test_marstat$pval_df
 ```
 
 Let X be the categorical random variable for Marital Status and Y be the one for Obesity. Assuming a random sample of n trials. Define the count random variable $N_{ij}:=\sum_{k=1}^n \mathbf{I}_k(X=i, Y=j)$ where $\mathbf{I}_k$ is the indicator function for the k-th trial, then the joint random variables $[N_{11}, ..., N_{IJ}]$ has a Multinomial distribution $\vec{p}=[p_{11}, ..., p_{IJ}]$. Our hypothesis test is therefore:
@@ -319,13 +319,13 @@ H_0: p_{ij}= p_{i+} \cdot p_{+j} ~ \forall i,j\\
 H_1:p_{ij} \neq p_{i+} \cdot p_{+j} ~ \forall i,j
 \end{gather*}
 ```
-We use the chi-squared test to conclude that there is not enough evidence to reject the null hypothesis with a p-value equal to `r pv`. In other words, we cannot conclude that there is a relationship between obesity and marital status.
+We use the chi-squared test to conclude that there is not enough evidence to reject the null hypothesis with a p-value equal to 0.6894. In other words, we cannot conclude that there is a relationship between obesity and marital status.
 
 We do the same test for other variables compared with obesity. From Table 2 we can see that we can reject the independence between obesity and wlkbik, vigrecexr and modrecexr variables.
 
 ```{r}
 tests<-IndepTest$new(nhanes, c("vigwrk","modwrk","wlkbik","vigrecexr","modrecexr"), "obese")
-tests$get_pvalue()%>%
+tests$pval_df%>%
   kable(caption = "p-values of Independence Tests between Different Variables and Obesity")%>%
   kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")
 ```
