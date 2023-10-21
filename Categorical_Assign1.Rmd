@@ -343,8 +343,8 @@ nhanes_data$bp_category <- with(nhanes_data, ifelse(
   sysbp < 120 & dbp < 80, "Normal",
   ifelse(sysbp >= 120 & sysbp <= 129 & dbp < 80, "Elevated",
   ifelse(sysbp > 180 | dbp > 120, "Hypertensive Crisis",
-  ifelse((sysbp >= 130 & sysbp <= 139) | (dbp >= 80 & dbp <= 89), "Hypertension Stage 1",
-  ifelse(sysbp >= 140 | dbp >= 90, "Hypertension Stage 2", NA))))))
+  ifelse(sysbp >= 140 | dbp >= 90, "Hypertension Stage 2",
+  ifelse((sysbp >= 130 & sysbp <= 139) | (dbp >= 80 & dbp <= 89), "Hypertension Stage 1", NA))))))
 
 # Preview
 #head(nhanes_data[, c("sysbp", "dbp", "bp_category")])
