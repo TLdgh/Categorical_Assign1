@@ -144,7 +144,126 @@ ggplot(gender,aes(x=age, y=Avgwt), group=gender)+
   
   labs(x="Age", y="Average weight (Kg)")+
   theme(plot.title = element_text(hjust = 0.5))
+
+
 ```
+
+
+In order to find the relationship between weight and gender or age , we first categorize the numerical variables. As mentioned in Table 1, we use the BMI level to categorize the weight and we still use this standard in the following process. For age, we are divided into three groups based on NIH recommendations: younger than 18 for adolescents, 18 to 65 for adults, and older than 65 for older adults. Then we crate the contingency tables for variables, and use pearson GOF chi-square test and likelihood ratio test to testing independence and discuss difference from two test methods.
+
+```{r}
+# Categorize age 
+Catenhanes<-nhanes%>%
+  mutate(agegroup=case_when(
+    age<18~"Adolescents",
+    age<65~"Adults",
+    age>=65~"Older Adults"),
+    BMI_level=case_when(
+  bmi <18.5 ~ "Underweight", 
+  bmi>=18.5 & bmi<=24.9 ~ "Healthy",
+  bmi>24.9 & bmi<=29.9 ~ "Overweight",
+  bmi>29.9  ~ "Obesity")
+  )%>%
+  filter(!is.na(bmi))
+Catenhanes$agegroup<-factor(Catenhanes$agegroup,levels=c("Adolescents","Adults","Older Adults"),labels=c("Adolescents","Adults","Older Adults"))
+Catenhanes$BMI_level<-factor(Catenhanes$BMI_level,levels=c("Underweight", "Healthy","Overweight","Obesity" ),labels=c("Underweight", "Healthy","Overweight","Obesity"))
+
+#contingency table: BMI vs agegroup
+testBA<-IndepTest$new(Catenhanes, "BMI_level", "agegroup")
+tableBA<-testBA$ContingencyTbl$BMI_level%>%
+  rename("\t" =BMI_level) %>%
+  add_column(" " = c("BMI level", rep(" ", nrow(.) - 1)), .before = "\t") %>%
+  kable(caption = "Contingency Table for BMI and Agegroup")%>%
+  kable_styling(bootstrap_options=c("striped","condensed"),full_width = F,position="float_left")%>%
+  add_header_above(c(" " = 1, " " = 1, "Agegroup" = 3))%>%
+  column_spec(1:2,width = "6em",bold=TRUE)
+tableBA
+```
+
+```{r}
+#contingency table: BMI vs Gender
+testBG<-IndepTest$new(Catenhanes, "BMI_level", "gender")
+tableBG<-testBG$ContingencyTbl$BMI_level%>%
+  rename("\t" =BMI_level) %>%
+  add_column(" " = c("BMI level", rep(" ", nrow(.) - 1)), .before = "\t") %>%
+  kable(caption = "Contingency Table for BMI and Gender")%>%
+  kable_styling(bootstrap_options=c("striped","condensed"),full_width = F,position="left")%>%
+  add_header_above(c(" " = 1, " " = 1, "Gender" = 2))%>%
+  column_spec(1:2,width = "8em",bold=TRUE)
+tableBG 
+```
+
+
+```{r}
+
+#likelihood ratio test (age)
+ba<-Catenhanes%>%
+ group_by(BMI_level,agegroup)%>%
+  summarise(count=n(),.groups="drop")
+BA<-matrix(ba$count,nrow=3,ncol=4)
+totalcol=c((17+86+21),(188+1322+343),(74+1536+518),(63+1765+512))
+totalrow=c((17+188+74+63),(86+1322+1536+1765),(21+343+518+512),sum(BA))
+BAT<-rbind(BA,totalcol)
+BAT<-cbind(BAT,totalrow)
+rownames(BAT)=c("Adolescents","Adults","Older Adults","Total")
+colnames(BAT)=c("Underweight", "Healthy","Overweight","Obesity","Total")
+propBAT<-round(BAT/6445,4)
+
+P_i<-matrix(propBAT[,5])
+P_j<-matrix(propBAT[4,])
+Exp<-round((P_i%*%t(P_j))*6445,4)
+ExpBA<-as.data.frame(Exp[1:3,1:4])
+ObsBA<-as.data.frame(BA)
+G_value=2*sum(ObsBA*log(ObsBA/ExpBA))
+PA=format(pchisq(G_value, df=6, lower.tail=FALSE), digits = 4)
+
+#likelihood ratio test (gender)
+bg<-Catenhanes%>%
+ group_by(BMI_level,gender)%>%
+  summarise(count=n(),.groups="drop")
+BG<-matrix(bg$count,nrow=2,ncol=4)
+totalcol=c((40+84),(884+969),(1168+960),(1052+1288))
+totalrow=c((40+884+1168+1052),(84+969+960+1288),sum(BG))
+BGT<-rbind(BG,totalcol)
+BGT<-cbind(BGT,totalrow)
+rownames(BGT)=c("Male","Female","Total")
+colnames(BGT)=c("Underweight", "Healthy","Overweight","Obesity","Total")
+propBGT<-round(BGT/6445,4)
+
+p_i<-matrix(propBGT[,5])
+p_j<-matrix(propBGT[3,])
+exp<-round((p_i%*%t(p_j))*6445,4)
+ExpBG<-as.data.frame(exp[1:2,1:4])
+ObsBG<-as.data.frame(BG)
+G_value=2*sum(ObsBG*log(ObsBG/ExpBG))
+PG=format(pchisq(G_value, df=3, lower.tail=FALSE), digits = 4)
+```
+
+
+```{r}
+#Chi-square table
+ptbl<-data.frame(testBA$pval_df, testBG$pval_df)
+colnames(ptbl)<-c("Weight VS Age ", "Weight VS.Gender")
+ptbl%>%
+  kable(caption = "Chi-square test p-values of Independence Tests between Variables") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"),full_width = F,position = "float_left")
+```
+
+
+```{r}
+#LRT table
+PA=as.character(PA)
+PG=as.character(PG)
+ltbl<-data.frame(PA,PG)
+colnames(ltbl)<-c("Weight VS Age ", "Weight VS.Gender")
+rownames(ltbl)<-"p-value"
+ltbl%>%
+  kable(caption = "Likelihood ratio test p-values of Independence Tests between Variables") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"),full_width = F,position = "float_left")
+
+```
+First, we ascertain the p-value by Chi-square test, the p-valve for weight and age is$2.543\times10^{-32}$ and p-value for weight and gender is $6.311\times10^{-13}$.The p-values from likelihood ratio test are slightly different with Chi-square test, $1.976\times10^{-29}$ for weight and age, $5.223\times10^{-13}$ for weight and gender. Both two methods have the p-value much less than 0.001, which indicates that therPA exist relationship between weight and age , weight and gender. Hence we rejected the null hypothesis and considered there exist significant relationship. 
+
 
 For the observations in different marital status, we also interested in the relationship between weight and marital status.The following box plot shows that the median weight under different marital status are all around 80 Kg, widowed observation have lowest weight among six categories. Married and Never Married observations have more people heavier than 130 Kg than other categories, which may not good for health.
 ```{r, fig.cap="Boxplot of Weight for Different Marital Status"}
@@ -468,7 +587,7 @@ In essence, sampling weights in complex survey designs play a crucial role in en
 
 # Conclusion
 
-In our analysis of the NHANES dataset, significant associations were identified between body weight, cholesterol levels, and blood pressure. Lifestyle factors, especially of vigorous recreational activities, were linked to healthier BMI ranges, emphasizing their importance in weight management. While marital status did not show a significant relationship with obesity, other factors like age and type of physical activity did impact weight. However, these findings should be interpreted cautiously due to potential confounding variables not accounted for in the dataset.
+In our analysis of the NHANES dataset, significant associations were identified between body weight, age, gender, cholesterol levels, and blood pressure. Lifestyle factors, especially of vigorous recreational activities, were linked to healthier BMI ranges, emphasizing their importance in weight management. While marital status did not show a significant relationship with obesity, other factors like age and type of physical activity did impact weight. However, these findings should be interpreted cautiously due to potential confounding variables not accounted for in the dataset.
 
 # References
 
