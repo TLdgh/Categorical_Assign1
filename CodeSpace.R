@@ -1,46 +1,5 @@
-oddsratio<-function(tbl,row.names=NULL){
-  res<-do.call(rbind,map(tbl, function(x){y<-as.matrix(x); y[1,1]*y[2,2]/(y[1,2]*y[2,1])}))
-  colnames(res)<-"Estimated Odds Ratio"
-  rownames(res)<-row.names
-  return(res)
-}
 
-IndepTest<-setRefClass(
-  "IndepTest",
-  fields = list(data="data.frame", variable_x="character", reference_y="character",pval_df="data.frame",ContingencyTbl="list" ),
-  methods=list(
-    initialize=function(data, variable_x, reference_y){
-      #make a contingency table for the variable X and Y
-      .self$ContingencyTbl<-.self$create_list(data, variable_x, reference_y)
-      
-      #calculate the pvalues and make a data frame
-      .self$pval_df<- .self$get_pvalue(my_list=ContingencyTbl)
-    },
-    
-    create_list=function(data, variable_x, reference_y){
-      my_list <- list()
-      for(x in variable_x){
-        my_list[[x]]<-data%>%select(all_of(c(x, reference_y)))%>%na.omit()%>%
-          group_by(across(everything(), as.factor))%>%tally()%>%spread(key=reference_y, value=n)}
-      return(my_list)
-    }, 
-    
-    get_pvalue=function(my_list){
-      #do the chi-squared test
-      pvalues<-map(my_list, function(x){
-        if(any(is.na(x))==FALSE){
-          y<-ungroup(x)%>%select(-any_of(group_vars(x)))%>%as.matrix()%>%chisq.test()
-          return(y$p.value)
-        }else{return("Has no values in Contingency Table")}
-      })
-      
-      #format it nicely
-      pvalues<-pvalues%>%data.frame(row.names = "p-value")%>%
-        mutate(across(where(is.numeric), .fns = ~as.character(signif(.,4))))
-      
-      return(pvalues)}
-  )
-)
+
 
 #Table 1 
 Bnhanes<-nhanes
@@ -123,6 +82,43 @@ Catenhanes<-nhanes%>%
   filter(!is.na(bmi))
 Catenhanes$agegroup<-factor(Catenhanes$agegroup,levels=c("Adolescents","Adults","Older Adults"),labels=c("Adolescents","Adults","Older Adults"))
 Catenhanes$BMI_level<-factor(Catenhanes$BMI_level,levels=c("Underweight", "Healthy","Overweight","Obesity" ),labels=c("Underweight", "Healthy","Overweight","Obesity"))
+
+IndepTest<-setRefClass(
+  "IndepTest",
+  fields = list(data="data.frame", variable_x="character", reference_y="character",pval_df="data.frame",ContingencyTbl="list" ),
+  methods=list(
+    initialize=function(data, variable_x, reference_y){
+      #make a contingency table for the variable X and Y
+      .self$ContingencyTbl<-.self$create_list(data, variable_x, reference_y)
+      
+      #calculate the pvalues and make a data frame
+      .self$pval_df<- .self$get_pvalue(my_list=ContingencyTbl)
+    },
+    
+    create_list=function(data, variable_x, reference_y){
+      my_list <- list()
+      for(x in variable_x){
+        my_list[[x]]<-data%>%select(all_of(c(x, reference_y)))%>%na.omit()%>%
+          group_by(across(everything(), as.factor))%>%tally()%>%spread(key=reference_y, value=n)}
+      return(my_list)
+    }, 
+    
+    get_pvalue=function(my_list){
+      #do the chi-squared test
+      pvalues<-map(my_list, function(x){
+        if(any(is.na(x))==FALSE){
+          y<-ungroup(x)%>%select(-any_of(group_vars(x)))%>%as.matrix()%>%chisq.test()
+          return(y$p.value)
+        }else{return("Has no values in Contingency Table")}
+      })
+      
+      #format it nicely
+      pvalues<-pvalues%>%data.frame(row.names = "p-value")%>%
+        mutate(across(where(is.numeric), .fns = ~as.character(signif(.,4))))
+      
+      return(pvalues)}
+  )
+)
 
 #contingency table: BMI vs agegroup
 testBA<-IndepTest$new(Catenhanes, "BMI_level", "agegroup")
@@ -391,6 +387,13 @@ tbl3%>%
   kable_styling(bootstrap_options=c("striped","condensed"),full_width=F, position="left")%>%
   add_header_above(c(" " = 1, " " = 1, "Recreational" = 2))%>%
   column_spec(1:2,bold=TRUE)
+
+oddsratio<-function(tbl,row.names=NULL){
+  res<-do.call(rbind,map(tbl, function(x){y<-as.matrix(x); y[1,1]*y[2,2]/(y[1,2]*y[2,1])}))
+  colnames(res)<-"Estimated Odds Ratio"
+  rownames(res)<-row.names
+  return(res)
+}
 
 list(tbl1, tbl2, tbl3)%>%map(function(x){ungroup(x)%>%select(-InRange)})%>%oddsratio(row.names = c("VigW=Y", "VigW=N", "Aggregated VigW"))%>%
   kable(caption = "OddsRatio for Conditional and Marginal Probability")%>%
