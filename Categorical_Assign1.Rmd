@@ -264,7 +264,7 @@ ltbl%>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
 
 ```
-First, we ascertain the p-value by Chi-square test, the p-valve for weight and age is$2.543\times10^{-32}$ and p-value for weight and gender is $6.311\times10^{-13}$.The p-values from likelihood ratio test are slightly different with Chi-square test, $1.976\times10^{-29}$ for weight and age, $5.223\times10^{-13}$ for weight and gender. Both two methods have the p-value much less than 0.001, which indicates that therPA exist relationship between weight and age , weight and gender. Hence we rejected the null hypothesis and considered there exist sighificant relationship. 
+First, we ascertain the p-value by Chi-square test, the p-valve for weight and age is$2.543\times10^{-32}$ and p-value for weight and gender is $6.311\times10^{-13}$.The p-values from likelihood ratio test are slightly different with Chi-square test, $1.976\times10^{-29}$ for weight and age, $5.223\times10^{-13}$ for weight and gender. Both two methods have the p-value much less than 0.001, which indicates that therPA exist relationship between weight and age , weight and gender. Hence we rejected the null hypothesis and considered there exist significant relationship. 
 
 
 For the observations in different marital status, we also interested in the relationship between weight and marital status.The following box plot shows that the median weight under different marital status are all around 80 Kg, widowed observation have lowest weight among six categories. Married and Never Married observations have more people heavier than 130 Kg than other categories, which may not good for health.
