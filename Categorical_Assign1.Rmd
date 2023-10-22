@@ -306,7 +306,7 @@ nhanes%>%mutate(CDC_obese=case_when(
 
 We then categorized the cholesterol and blood pressure level into different levels. According to American Heart Association ATPIII [@ATP], We have: tchol $\geq$ 240mg/dl OR hdl $<$ 40mg/dL as Dangerous Cholesterol level; tchol between 200-239mg/dL OR hdl between 40-59mg/dL for males (50-59mg/dL for females) as At Risk level; tchol $<$ 200mg/dL and hdl $\geq$ 60mg/dL as Healthy level.
 
-Blood pressure is typically categorized into different stages based on the systolic (top number) and diastolic (bottom number) readings. According to American Heart Association, We have: systolic level $<$ 120mm Hg and diastolic level $<$ 80mm Hg as normal blood pressure; systolic level between 120-129mm Hg and diastolic level $<$ 80mm Hg as elevated blood pressure; systolic level between 130-139mm Hg OR diastolic level between 80-89mm Hg as Hypertension Stage 1; systolic level $\geq$ 140mm Hg OR diastolic level $\geq$ 90mm Hg as Hypertension Stage 2; systolic level $>$ 180mm Hg OR diastolic level $>$ 120mm Hg as Hypertensive Crisis.
+Blood pressure is typically categorized into different stages based on the systolic (top number) and diastolic (bottom number) readings. According to American Heart Association [@BloodP], We have: systolic level $<$ 120mm Hg and diastolic level $<$ 80mm Hg as normal blood pressure; systolic level between 120-129mm Hg and diastolic level $<$ 80mm Hg as elevated blood pressure; systolic level between 130-139mm Hg OR diastolic level between 80-89mm Hg as Hypertension Stage 1; systolic level $\geq$ 140mm Hg OR diastolic level $\geq$ 90mm Hg as Hypertension Stage 2; systolic level $>$ 180mm Hg OR diastolic level $>$ 120mm Hg as Hypertensive Crisis.
 
 ```{r}
 #Categorization
