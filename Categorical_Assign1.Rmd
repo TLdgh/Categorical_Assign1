@@ -173,14 +173,12 @@ testBA<-IndepTest$new(Catenhanes, "BMI_level", "agegroup")
 tableBA<-testBA$ContingencyTbl$BMI_level%>%
   rename("\t" =BMI_level) %>%
   add_column(" " = c("BMI level", rep(" ", nrow(.) - 1)), .before = "\t") %>%
-  kable(caption = "Contingency Table for BMI level and Agegroup")%>%
-  kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")%>%
+  kable(caption = "Contingency Table for BMI and Agegroup")%>%
+  kable_styling(bootstrap_options=c("striped","condensed"),full_width = F,position="float_left")%>%
   add_header_above(c(" " = 1, " " = 1, "Agegroup" = 3))%>%
-  column_spec(1:2,width = "10em",bold=TRUE)
- 
+  column_spec(1:2,width = "6em",bold=TRUE)
 tableBA
 ```
-
 
 ```{r}
 #contingency table: BMI vs Gender
@@ -188,10 +186,10 @@ testBG<-IndepTest$new(Catenhanes, "BMI_level", "gender")
 tableBG<-testBG$ContingencyTbl$BMI_level%>%
   rename("\t" =BMI_level) %>%
   add_column(" " = c("BMI level", rep(" ", nrow(.) - 1)), .before = "\t") %>%
-  kable(caption = "Contingency Table for BMI level and Gender")%>%
-  kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")%>%
+  kable(caption = "Contingency Table for BMI and Gender")%>%
+  kable_styling(bootstrap_options=c("striped","condensed"),full_width = F,position="left")%>%
   add_header_above(c(" " = 1, " " = 1, "Gender" = 2))%>%
-  column_spec(1:2,width = "10em",bold=TRUE)
+  column_spec(1:2,width = "8em",bold=TRUE)
 tableBG 
 ```
 
@@ -248,7 +246,7 @@ ptbl<-data.frame(testBA$pval_df, testBG$pval_df)
 colnames(ptbl)<-c("Weight VS Age ", "Weight VS.Gender")
 ptbl%>%
   kable(caption = "Chi-square test p-values of Independence Tests between Variables") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
+  kable_styling(bootstrap_options = c("striped", "condensed"),full_width = F,position = "float_left")
 ```
 
 
@@ -261,7 +259,7 @@ colnames(ltbl)<-c("Weight VS Age ", "Weight VS.Gender")
 rownames(ltbl)<-"p-value"
 ltbl%>%
   kable(caption = "Likelihood ratio test p-values of Independence Tests between Variables") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
+  kable_styling(bootstrap_options = c("striped", "condensed"),full_width = F,position = "float_left")
 
 ```
 First, we ascertain the p-value by Chi-square test, the p-valve for weight and age is$2.543\times10^{-32}$ and p-value for weight and gender is $6.311\times10^{-13}$.The p-values from likelihood ratio test are slightly different with Chi-square test, $1.976\times10^{-29}$ for weight and age, $5.223\times10^{-13}$ for weight and gender. Both two methods have the p-value much less than 0.001, which indicates that therPA exist relationship between weight and age , weight and gender. Hence we rejected the null hypothesis and considered there exist significant relationship. 
