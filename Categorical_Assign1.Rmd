@@ -37,7 +37,7 @@ We were given the data set of The National Health and Nutrition Examination Surv
 
 The survey data wasn't a simple random sample, however. According to CDC's National Health and Nutrition Examination Survey: Plan and Operations, 1999--2010 [@SurveyDesign], the sampling strategy consists of several stages: 1. Selection of counties as primary sampling units (PSU). 2. selection of segments within PSUs that constitute blocks of households. 3. Selection of specific households within segments. 4. Selection of individuals within a household.
 
-In this assignment, we accessed the data set from the aplore3 package in R, which contains 6482 observations in 21 variables. Eight Of these variables (gender, marstat, vigwrk, modwrk, wlkbik, vigrecexr, and obesity) are considered as categorical variables, while the rest are numerical variables. We aim to study the relationship between the weight variable and the other health related variables of the data.
+In this assignment, we accessed the data set from the aplore3 package in R, which contains 6482 observations in 21 variables. Eight of these variables (gender, marstat, vigwrk, modwrk, wlkbik, vigrecexr, and obesity) are considered as categorical variables, while the rest are numerical variables. We aim to study the relationship between the weight variable and the other health related variables of the data.
 
 # Method
 
