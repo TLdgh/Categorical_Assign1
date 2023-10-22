@@ -178,8 +178,11 @@ tableBA<-testBA$ContingencyTbl$BMI_level%>%
   add_header_above(c(" " = 1, " " = 1, "Agegroup" = 3))%>%
   column_spec(1:2,width = "10em",bold=TRUE)
  
-tableBA 
+tableBA
+```
 
+
+```{r}
 #contingency table: BMI vs Gender
 testBG<-IndepTest$new(Catenhanes, "BMI_level", "gender")
 tableBG<-testBG$ContingencyTbl$BMI_level%>%
@@ -189,17 +192,11 @@ tableBG<-testBG$ContingencyTbl$BMI_level%>%
   kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")%>%
   add_header_above(c(" " = 1, " " = 1, "Gender" = 2))%>%
   column_spec(1:2,width = "10em",bold=TRUE)
- 
 tableBG 
-#calculate the p-value
-testBA$pval_df%>%
-  kable(caption = "p-values of Independence Tests between Age group and BMI_level")%>%
-  kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")
+```
 
-#calculate the p-value
-testBG$pval_df%>%
-  kable(caption = "p-values of Independence Tests between Age group and Gender")%>%
-  kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")
+
+```{r}
 
 #likelihood ratio test (age)
 ba<-Catenhanes%>%
@@ -242,14 +239,20 @@ ExpBG<-as.data.frame(exp[1:2,1:4])
 ObsBG<-as.data.frame(BG)
 G_value=2*sum(ObsBG*log(ObsBG/ExpBG))
 PG=pchisq(G_value, df=3, lower.tail=FALSE)
+```
 
+
+```{r}
 #Chi-square table
 ptbl<-data.frame(testBA$pval_df, testBG$pval_df)
 colnames(ptbl)<-c("Weight VS Age ", "Weight VS.Gender")
 ptbl%>%
   kable(caption = "Chi-square test p-values of Independence Tests between Variables") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
+```
 
+
+```{r}
 #LRT table
 PA=as.character(PA)
 PG=as.character(PG)
