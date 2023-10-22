@@ -468,5 +468,7 @@ In essence, sampling weights in complex survey designs play a crucial role in en
 
 # Conclusion
 
+In our analysis of the NHANES dataset, significant associations were identified between body weight, cholesterol levels, and blood pressure. Lifestyle factors, especially of vigorous recreational activities, were linked to healthier BMI ranges, emphasizing their importance in weight management. While marital status did not show a significant relationship with obesity, other factors like age and type of physical activity did impact weight. However, these findings should be interpreted cautiously due to potential confounding variables not accounted for in the dataset.
+
 # References
 
