@@ -1,6 +1,4 @@
-
-
-
+#Section 3
 #Table 1 
 Bnhanes<-nhanes
 Bnhanes<-mutate(Bnhanes,BMI_level = case_when(
@@ -50,6 +48,7 @@ tbl<-table1 (~ gender+age+marstat+samplewt+psu+strata+tchol+hdl+sysbp+dbp+wt+ht+
 kable(tbl,"html",caption="Characteristics of the data set NHANES")%>%
   kable_styling(bootstrap_options = "striped", full_width = F)
 
+#Section 3.1
 #exploratory average weight in every age grouped by gender
 gender<-nhanes%>%
   group_by(gender,age)%>%
@@ -201,6 +200,7 @@ ltbl%>%
   kable(caption = "Likelihood ratio test p-values of Independence Tests between Variables") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"),full_width = F,position = "float_left")
 
+#Section 3.2
 #box plot for weight VS marital status
 Nhanes<-nhanes%>%
   na.omit()
@@ -226,6 +226,7 @@ test_marstat$pval_df%>%
   kable_styling(bootstrap_options=c("striped","condensed"),full_width=F,position="float_left")%>%
   column_spec(2,width = "15em",bold=TRUE)
 
+#Section 3.3
 nhanes%>%mutate(CDC_obese=case_when(
   bmi <18.5 ~ "Underweight", 
   bmi>=18.5 & bmi<=24.9 ~ "Healthy",
@@ -314,6 +315,7 @@ colnames(pvals)<-c("Weight VS Cholesterol", "Weight VS. Blood Pressure", "Choles
 pvals%>%kable(caption = "p-values of Independence Tests between Variables") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
 
+#Section 3.4
 #boxplot for Vigorous activities VS bmi
 Nhanes1<-nhanes%>%select(bmi, vigwrk, vigrecexr)%>%na.omit()%>%
   mutate(vigrecexr=factor(vigrecexr, levels = c("Yes", "No"), labels = c("VigR=Yes", "VigR=No")))%>%
