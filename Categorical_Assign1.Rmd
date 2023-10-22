@@ -248,7 +248,6 @@ H_1:p_{1} > p_{2}
 \end{gather*}
 ```
 
-
 ```{r}
 Vig_Rec1<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), vigrecexr)%>%na.omit()%>%filter(vigrecexr=="Yes")%>%group_by(InRange)%>%count()
 colnames(Vig_Rec1)<-c("InRange", "Vigorous Recreational Activities=Yes")
