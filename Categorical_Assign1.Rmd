@@ -250,6 +250,12 @@ ptbl%>%
   kable(caption = "Chi-square test p-values of Independence Tests between Variables") %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
 
+#LRT table
+ltbl<-data.frame(PA,PG)
+colnames(ltbl)<-c("Weight VS Age ", "Weight VS.Gender")
+rownames(ltbl)<-"P-value"
+ltbl
+
 
 
 ```
