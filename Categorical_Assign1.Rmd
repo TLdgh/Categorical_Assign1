@@ -4,7 +4,7 @@ author:
 - Teng Li(7373086)
 - Zhize Lu(300075114)
 - Chutong Zhang(300311325)
-output: html_document
+output: bookdown::html_document2
 header-includes:
 - \renewcommand{\and}{\\}
 - \usepackage{float}
@@ -33,7 +33,7 @@ library(table1)
 source("CodeSpace.R")
 ```
 
-## Introduction
+# Introduction
 
 We were given the data set of The National Health and Nutrition Examination Survey (NHANES). The survey program has been conducted as a series of surveys designed to assess the health and nutritional status of adults and children in the United States since the 1960s, according to CDC [@CDC]. It combines in-person face-to-face interviews and physical examinations of participants for data collection.
 
@@ -41,11 +41,11 @@ The survey data wasn't a simple random sample, however. According to CDC's Natio
 
 We aim to study the relationship between the weight variable and the other health related variables of the data.
 
-## Method
+# Method
 
 We began our study by doing an exploratory analysis among the variables through various tables and charts. We then performed several hypothesis tests on some of the variables. Lastly we did a linear regression model fit to the response variable "weight" with other variables and confounders.
 
-## Part 1: Exploratory Analysis
+# Analysis
 
 We began our analysis by giving a data dictionary of the data shown in Table 1 below. As one can see that some variables have a high percentage of missing values. In Part 2 we made hypothesis tests to decide if some of these variables could be excluded from the regression analysis in Part 3.
 
@@ -100,27 +100,26 @@ units(Bnhanes$bmi) <- "Kg/m^2"
 units(Bnhanes$sedmin) <- "mins"
 
 my.render.cont <- function(x) {
-    with(stats.apply.rounding(stats.default(x), digits=3), c("",
-        "Mean (SD)"=sprintf("%s (± %s)", MEAN, SD)))
+  with(stats.apply.rounding(stats.default(x), digits=3), c("",
+                                                           "Mean (SD)"=sprintf("%s (± %s)", MEAN, SD)))
 }
 
 tbl<-table1 (~ gender+age+marstat+samplewt+psu+strata+tchol+hdl+sysbp+dbp+wt+ht+vigwrk+modwrk+wlkbik+vigrecexr+modrecexr+sedmin+obese |BMI_level,render.continuous=my.render.cont, data=Bnhanes)
-kable(tbl,"html",caption="Table 1: Characteristics of the data set NHANES")%>%
+kable(tbl,"html",caption="Characteristics of the data set NHANES")%>%
   kable_styling(bootstrap_options = "striped", full_width = F)
 ```
 
 According to CDC's classification on bodyweight, we have: BMI\<18.5 as Underweight, BMI between 18.5 and 24.9 as Health, BMI between 25 and 29.9 as Overweight, and BMI\>30 as obesity. We adopted this category and found that there was a slight positive relationship between bodyweight and the total cholesterol level. However, we noticed that there was a negative relationship between the HDL and bodyweight. Because of the fact that Tchol is the sum of HDL and LDL, we can conclude that the obese population has a high level of LDL and a low level HDL.
 
-```{r}
+```{r, fig.cap="Mean Cholesterol level across Categories of Body Weight"}
 nhanes%>%mutate(CDC_obese=case_when(
   bmi <18.5 ~ "Underweight", 
   bmi>=18.5 & bmi<=24.9 ~ "Healthy",
   bmi>24.9 & bmi<=29.9 ~ "Overweight",
   bmi>29.9  ~ "Obesity"
 ))%>%transmute(CDC_obese=factor(CDC_obese, levels=c("Underweight", "Healthy", "Overweight", "Obesity")), tchol, hdl)%>%na.omit()%>% group_by(CDC_obese)%>%summarise(Mean_tchol=mean(tchol), Mean_hdl=mean(hdl))%>%gather("Type", "Value",Mean_tchol:Mean_hdl)%>%
-  plot_ly(x=~CDC_obese, y=~Value, color = ~Type, type = "scatter", mode="lines", height = 300,width = 400)%>%
+  plot_ly(x=~CDC_obese, y=~Value, color = ~Type, type = "scatter", mode="lines", height = 300,width = 500)%>%
   layout(
-    title=list(text="Mean Cholesterol level across Categories of Bodyweight",font=list(size=12)),
     yaxis = list(range = c(45, 200),dtick = 50)
   )
 ```
@@ -128,7 +127,7 @@ nhanes%>%mutate(CDC_obese=case_when(
 According to ATPIII [@ATP], we can also categorize the cholesterol level.
 
 This data set mainly focus on the observers between 16 to 80 years old. Among them, the average weight for male is greater than female among all ages, and as we can see from the line chart that the change in average weight with age follow the same trend across the gender, with a general tendency to sustained increase, followed by fluctuation and continuous decrease finally. It can be considered as there might exist some relationship with weight and age.
-```{r}
+```{r, fig.cap="Average Weight in Different Age"}
 #exploratory average weight in every age grouped by gender
 gender<-nhanes%>%
   group_by(gender,age)%>%
@@ -143,7 +142,7 @@ ggplot(gender,aes(x=age, y=Avgwt), group=gender)+
   scale_y_continuous( labels = scales::comma  ) +
   theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45))+
   
-  labs(title="Average Weight in Different Age",x="Age", y="Average weight (Kg)")+
+  labs(x="Age", y="Average weight (Kg)")+
   theme(plot.title = element_text(hjust = 0.5))
 
 
@@ -249,21 +248,21 @@ pchisq(G_value, df=3, lower.tail=FALSE)
 ```
 
 For the observations in different marital status, we also interested in the relationship between weight and marital status.The following box plot shows that the median weight under different marital status are all around 80 Kg, widowed observation have lowest weight among six categories. Married and Never Married observations have more people heavier than 130 Kg than other categories, which may not good for health.
-```{r}
+```{r, fig.cap="Boxplot of Weight for Different Marital Status"}
 #box plot for weight VS marital status
 Nhanes<-nhanes%>%
   na.omit()
 ggplot(Nhanes, aes(x=marstat, y=wt, fill=marstat))+
   geom_boxplot() + 
   scale_fill_brewer(palette="Blues") +
-  labs(title = "Plot for weight in each marital status", x="Marital Status", y="Weight (Kg)")+
+  labs(x="Marital Status", y="Weight (Kg)")+
   theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
         plot.title = element_text(hjust = 0.5)
   )
 ```
 
 We then want to analyze the relationship between body weight and human activities. The two types of activity measures were given in the data, the work activity and the recreational activity. We explored different intensity levels of work and recreational activities and their potential relationships. From Figure below one can see that the vigorous recreational activities yield BMI observations between the healthy range of 18.5 to 30, regardless of the condition on work activities. However, the non-vigorous recreational activities yield systemically higher levels of BMI than that of the vigorous recreational activities, again regardless of the condition on work activities. We observed the same pattern when considering moderate intensity of work and recreational activities in Figure . If one do a vertical comparison between the intensity of activities, there was no significant difference, except that vigorous recreational activities lower the 25% to 75% quantile range of BMI a little closer to the healthy interval than moderate recreational activities do. Therefore we suspect that recreational activity plays more important row in determining the level of BMI than work activity.
-```{r} 
+```{r, fig.cap="Boxplot of BMI for Different Vigorous Activities"} 
 #boxplot for Vigorous activities VS bmi
 Nhanes1<-nhanes%>%select(bmi, vigwrk, vigrecexr)%>%na.omit()
 Nhanes1$vigrecexr<-factor(Nhanes1$vigrecexr, levels = c("Yes", "No"), labels = c("Vigorous Recreational Activities", "No Vigorous Recreational Activities"))
@@ -281,10 +280,13 @@ ggplot(Nhanes1, aes(x=vigwrk, y=bmi, fill=vigwrk))+
   geom_hline(yintercept = 30, linetype="dotted", size = 0.5)+
   annotate("text", y=18.5, x="Yes", label=" underweight")+
   annotate("text", y=30,x="Yes", label=" obsity")+
-  labs(title = "Plot for BMI in Vigorous Activities", x="Vigorous Work Activity", y="BMI")+
+  labs(x="Vigorous Work Activity", y="BMI")+
   theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
         plot.title = element_text(hjust = 0.5)
   )
+```
+
+```{r, fig.cap="Boxplot of BMI for Different Moderate Activities"} 
 
 ggplot(Nhanes2, aes(x=modwrk, y=bmi, fill=modwrk))+
   geom_boxplot() + 
@@ -294,7 +296,7 @@ ggplot(Nhanes2, aes(x=modwrk, y=bmi, fill=modwrk))+
   geom_hline(yintercept = 30, linetype="dotted", size = 0.5)+
   annotate("text", y=18.5, x="Yes", label=" underweight")+
   annotate("text", y=30,x="Yes", label=" obsity")+
-  labs(title = "Plot for BMI in Moderate Activities", x="Moderate Work Activity", y="BMI")+
+  labs(x="Moderate Work Activity", y="BMI")+
   theme(axis.text.x = element_text(size =7, vjust = 0.5, hjust = 0.5, angle = 45),
         plot.title = element_text(hjust = 0.5)
   )
@@ -309,7 +311,7 @@ tbl1<-Nhanes1%>%filter(vigwrk=="Yes")%>%group_by(across(c(InRange, vigrecexr), a
 tbl1%>%
   rename("\t" = InRange)%>%
   add_column(" " = c("InRange", rep(" ", nrow(.) - 1)), .before = "\t") %>%
-  kable(caption = "Contingency Table")%>%
+  kable(caption = "Contingency Table for InRange and Levels of Recreational Activities, given Vigorous Work Activities")%>%
   kable_styling(bootstrap_options=c("striped","condensed"),full_width=F,position="center")%>%
   add_header_above(c(" " = 1, " " = 1, "Recreational Activities | Vigorous Work Activities = Yes" = 2))%>%
   column_spec(1:2,width = "10em",bold=TRUE)
@@ -318,17 +320,22 @@ tbl2<-Nhanes1%>%filter(vigwrk=="No")%>%group_by(across(c(InRange, vigrecexr), as
 tbl2%>%
   rename("\t" = InRange)%>%
   add_column(" " = c("InRange", rep(" ", nrow(.) - 1)), .before = "\t") %>%
-  kable(caption = "Contingency Table")%>%
+  kable()%>%
   kable_styling(bootstrap_options=c("striped","condensed"),full_width=F, position="center")%>%
   add_header_above(c(" " = 1, " " = 1, "Recreational Activities | Vigorous Work Activities = No" = 2))%>%
   column_spec(1:2,width = "10em",bold=TRUE)
 ```
 
-Assuming the risk $p$ is defined as the probability of having a BMI not inside the range of 18.5 to 30, i.e. either being underweight or obesity. We defined $p_1$ as the risk for the participants with Vigorous Recreational Activities, and $p_2$ is the risk for those with No Vigorous Recreational Activities. We computed the marginal and aggregated Odds Ratios given levels of Vigorous Work Activities:
+Assuming the risk $p$ is defined as the probability of having a BMI not inside the range of 18.5 to 30, i.e. either being underweight or obesity. We defined $p_1$ as the risk for the participants with Vigorous Recreational Activities, and $p_2$ is the risk for those with No Vigorous Recreational Activities. We computed the marginal and aggregated Odds Ratios given levels of Vigorous Work Activities.
+
 ```{r}
 # Aggregate over all levels of Vigorous Work Activities
 tbl3<-Nhanes1%>%group_by(across(c(InRange, vigrecexr), as.factor))%>%tally()%>%spread(key=vigrecexr, value=n)
-list(tbl1, tbl2, tbl3)%>%map(function(x){ungroup(x)%>%select(-InRange)})%>%oddsratio(row.names = c("Given vigwrk==Yes", "Given vigwrk==No", "Aggregated vigwrk"))
+list(tbl1, tbl2, tbl3)%>%map(function(x){ungroup(x)%>%select(-InRange)})%>%oddsratio(row.names = c("Given vigwrk==Yes", "Given vigwrk==No", "Aggregated vigwrk"))%>%
+  kable(caption = "OddsRatio for Conditional and Marginal Probability")%>%
+  kable_styling(bootstrap_options=c("striped","condensed"),full_width=F, position="float_left")%>%
+  column_spec(1,bold=TRUE)
+
 ```
 
 In all cases we have an Odds ratio greater than 1, indicating that doing vigorous recreational activities can lower the odds of getting a risky BMI, regardless of having the vigorous work activities or not. This gave us a potential suggestion to those who have to work for a long time without gaining adequate physical activities. The recreational activities seems to play a more important role in maintaining a healthy level of body weight.
@@ -342,28 +349,36 @@ H_1:p_{1} > p_{2}
 \end{gather*}
 ```
 
+```{r}
+Vig_Rec1<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), vigrecexr)%>%na.omit()%>%filter(vigrecexr=="Yes")%>%group_by(InRange)%>%count()
+colnames(Vig_Rec1)<-c("InRange", "Vigorous Recreational Activities=Yes")
+
+
+Mod_Rec1<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), modrecexr)%>%na.omit()%>%filter(modrecexr=="Yes")%>%group_by(InRange)%>%count()
+colnames(Mod_Rec1)<-c("InRange", "Moderate Recreational Activities=Yes")
+
+p1<-1028/(1028+371)
+p2<-1657/(1657+828)
+z1<-(p1-p2)/sqrt(p1*(1-p1)/(1028+371) + p2*(1-p2)/(1657+828))
+
+Vig_Rec2<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), vigrecexr)%>%na.omit()%>%filter(vigrecexr=="No")%>%group_by(InRange)%>%count()
+colnames(Vig_Rec2)<-c("InRange", "Vigorous Recreational Activities=Yes")
+
+Mod_Rec2<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), modrecexr)%>%na.omit()%>%filter(modrecexr=="No")%>%group_by(InRange)%>%count()
+colnames(Mod_Rec2)<-c("InRange", "Moderate Recreational Activities=Yes")
+
+p1<-2981/(2981+2064)
+p2<-2351/(2351+1607)
+z2<-(p1-p2)/sqrt(p1*(1-p1)/(2981+2064) + p2*(1-p2)/(2351+1607))
+
+merge(merge(Vig_Rec1, Mod_Rec1, by="InRange"), merge(Vig_Rec2, Mod_Rec2, by="InRange"), by="InRange")%>%
+  kable(caption="Frequency Table")%>%kable_styling(bootstrap_options=c("striped","condensed"),full_width=F,position="float_left")
+```
 
 ```{r}
-Vig_Rec<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), vigrecexr)%>%na.omit()%>%filter(vigrecexr=="Yes")
-Vig_Rec%>%group_by(InRange)%>%count()
-p1<-1028/(1028+371)
-
-Mod_Rec<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), modrecexr)%>%na.omit()%>%filter(modrecexr=="Yes")
-Mod_Rec%>%group_by(InRange)%>%count()
-p2<-1657/(1657+828)
-z<-(p1-p2)/sqrt(p1*(1-p1)/(1028+371) + p2*(1-p2)/(1657+828))
-pnorm(-z) #reject null
-
-
-Vig_Rec<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), vigrecexr)%>%na.omit()%>%filter(vigrecexr=="No")
-Vig_Rec%>%group_by(InRange)%>%count()
-p1<-2981/(2981+2064)
-
-Mod_Rec<-nhanes%>%transmute(InRange=factor((ifelse(bmi>18.5 & bmi <30, "Yes", "No")), levels = c("Yes", "No")), modrecexr)%>%na.omit()%>%filter(modrecexr=="No")
-Mod_Rec%>%group_by(InRange)%>%count()
-p2<-2351/(2351+1607)
-z<-(p1-p2)/sqrt(p1*(1-p1)/(2981+2064) + p2*(1-p2)/(2351+1607))
-2*pnorm(z) #reject null
+data.frame(vigrecexr=pnorm(-z1), modrecexr=2*pnorm(z2), row.names = "pvalue")%>%
+  kable(caption = "pvalues for two-sample test")%>%
+  kable_styling(bootstrap_options=c("striped","condensed"),full_width=F,position="float_left")
 ```
 
 Our conclusion is that we did see there's a higher probability of getting the healthy weight when Vigorous Recreational Activities are done. However when choosing the moderate level of recreational activities, there's no conclusion in the hypothesis test.
@@ -383,8 +398,12 @@ test_marstat$ContingencyTbl$marstat%>%
   kable_styling(bootstrap_options=c("striped","condensed"),position="float_left")%>%
   add_header_above(c(" " = 1, " " = 1, "Obesity" = 2))%>%
   column_spec(1:2,width = "10em",bold=TRUE)
-
-test_marstat$pval_df
+```
+```{r}
+test_marstat$pval_df%>%
+  kable(caption = "pvalues for Chi-squared Independence Test")%>%
+  kable_styling(bootstrap_options=c("striped","condensed"),full_width=F,position="float_left")%>%
+  column_spec(2,width = "15em",bold=TRUE)
 ```
 
 Let X be the categorical random variable for Marital Status and Y be the one for Obesity. Assuming a random sample of n trials. Define the count random variable $N_{ij}:=\sum_{k=1}^n \mathbf{I}_k(X=i, Y=j)$ where $\mathbf{I}_k$ is the indicator function for the k-th trial, then the joint random variables $[N_{11}, ..., N_{IJ}]$ has a Multinomial distribution $\vec{p}=[p_{11}, ..., p_{IJ}]$. Our hypothesis test is therefore:
@@ -395,6 +414,7 @@ H_0: p_{ij}= p_{i+} \cdot p_{+j} ~ \forall i,j\\
 H_1:p_{ij} \neq p_{i+} \cdot p_{+j} ~ \forall i,j
 \end{gather*}
 ```
+
 We use the chi-squared test to conclude that there is not enough evidence to reject the null hypothesis with a p-value equal to 0.6894. In other words, we cannot conclude that there is a relationship between obesity and marital status.
 
 We do the same test for other variables compared with obesity. From Table 2 we can see that we can reject the independence between obesity and wlkbik, vigrecexr and modrecexr variables.
@@ -422,7 +442,7 @@ nhanes_data <- nhanes_data[complete.cases(nhanes_data[, c("bmi", "gender", "tcho
 nhanes_data$weight_category <- with(nhanes_data, ifelse(
   bmi < 18.5, "Underweight",
   ifelse(bmi >= 18.5 & bmi <= 24.9, "Healthy",
-  ifelse(bmi >= 25 & bmi <= 29.9, "Overweight", "Obese"))))
+         ifelse(bmi >= 25 & bmi <= 29.9, "Overweight", "Obese"))))
 
 # Categorizing cholesterol levels
 nhanes_data$chol_category <- with(nhanes_data, ifelse(
@@ -444,14 +464,14 @@ nhanes_data$bp_category <- with(nhanes_data, ifelse(
   sysbp < 120 & dbp < 80, "Normal",
   ifelse(sysbp >= 120 & sysbp <= 129 & dbp < 80, "Elevated",
   ifelse(sysbp > 180 | dbp > 120, "Hypertensive Crisis",
-  ifelse((sysbp >= 130 & sysbp <= 139) | (dbp >= 80 & dbp <= 89), "Hypertension Stage 1",
-  ifelse(sysbp >= 140 | dbp >= 90, "Hypertension Stage 2", NA))))))
+  ifelse(sysbp >= 140 | dbp >= 90, "Hypertension Stage 2",
+  ifelse((sysbp >= 130 & sysbp <= 139) | (dbp >= 80 & dbp <= 89), "Hypertension Stage 1", NA))))))
 
 # Preview
 #head(nhanes_data[, c("sysbp", "dbp", "bp_category")])
 ```
 
-Contingency tables and Hypothesis tests
+After categorizing Cholesterol level and blood pressure, we create three contingency tables:
 
 ```{r}
 test1 <- IndepTest$new(nhanes_data, "weight_category", "chol_category")
@@ -466,7 +486,10 @@ table_weight_chol <- test1$ContingencyTbl$weight_category %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left") %>%
   add_header_above(c(" " = 1, " " = 1, "Cholesterol" = 3)) %>%
   column_spec(1:2, width = "10em", bold = TRUE)
+table_weight_chol
+```
 
+```{r}
 #contingency table for Weight vs. Blood Pressure
 table_weight_bp <- test2$ContingencyTbl$weight_category %>%
   rename("\t" = weight_category) %>%
@@ -475,7 +498,10 @@ table_weight_bp <- test2$ContingencyTbl$weight_category %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left") %>%
   add_header_above(c(" " = 1, " " = 1, "Blood Pressure" = 5)) %>%
   column_spec(1:2, width = "10em", bold = TRUE)
+table_weight_bp
+```
 
+```{r}
 #contingency table for Cholesterol vs. Blood Pressure
 table_chol_bp <- test3$ContingencyTbl$chol_category %>%
   rename("\t" = chol_category) %>%
@@ -484,27 +510,21 @@ table_chol_bp <- test3$ContingencyTbl$chol_category %>%
   kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left") %>%
   add_header_above(c(" " = 1, " " = 1, "Blood Pressure" = 5)) %>%
   column_spec(1:2, width = "10em", bold = TRUE)
-
-table_weight_chol
-table_weight_bp
 table_chol_bp
-
-pvals1 <- test1$pval_df %>%
-  kable(caption = "p-values of Independence Tests between Weight and Cholesterol") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
-
-pvals2 <- test2$pval_df %>%
-  kable(caption = "p-values of Independence Tests between Weight and Blood Pressure") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
-
-pvals3 <- test3$pval_df %>%
-  kable(caption = "p-values of Independence Tests between Cholesterol and Blood Pressure") %>%
-  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
-
-pvals1
-pvals2
-pvals3
 ```
+
+```{r}
+pvals<-data.frame(test1$pval_df, test2$pval_df, test3$pval_df)
+colnames(pvals)<-c("Weight VS Cholesterol", "Weight VS. Blood Pressure", "Cholesterol VS. Blood Pressure")
+
+pvals%>%kable(caption = "p-values of Independence Tests between Variables") %>%
+  kable_styling(bootstrap_options = c("striped", "condensed"), position = "float_left")
+```
+We also conducted hypothesis testing using Pearson chi-squared test. The p-value for weight and cholesterol is extremely small, equals to $1.475\times10^{-53}$. This suggest that there is a statistically significant association between weight and cholesterol levels. For weight against blood pressure, the p-value is $5.723\times10^{-35}$ which indicates that between weight and blood pressure, there is significant relationship. Cholesterol level is also associated with blood pressure with a p-value equals to $3.286\times10^{-13}$.
+
+However, there are potential confounding variables like age, diet, etc. Some of the variables are not recorded in the data. For further study, we need to conduct stratified analysis. 
+
+The results suggest that there is a significant association between weight, cholesterol, and blood pressure. The patterns observed in the contingency tables align with general health knowledge: obesity is a risk factor for both high cholesterol and high blood pressure. 
 
 ## Exrtra topic: Survey weights in complex survey designs
 
@@ -548,6 +568,8 @@ In essence, sampling weights in complex survey designs play a crucial role in en
 
 
 # Conclusion
+
+In our analysis of the NHANES dataset, significant associations were identified between body weight, cholesterol levels, and blood pressure. Lifestyle factors, especially of vigorous recreational activities, were linked to healthier BMI ranges, emphasizing their importance in weight management. While marital status did not show a significant relationship with obesity, other factors like age and type of physical activity did impact weight. However, these findings should be interpreted cautiously due to potential confounding variables not accounted for in the dataset.
 
 # References
 
