@@ -17,7 +17,7 @@ link-citations: yes
 .title, .author{text-align: center;}
 body{font-size: 12pt;}
 table{font-size: 12pt;}
-h1{font-size: 13pt;}
+h1{font-size: 14pt;}
 h2{font-size: 12pt;}
 </style>
 
